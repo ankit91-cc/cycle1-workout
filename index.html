@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cycle 1">
+<title>Cycle 1 — Strength Build</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f0f0f;--surf:#1a1a1a;--surf2:#222;--surf3:#2a2a2a;
+  --border:#2e2e2e;--border2:#3a3a3a;
+  --accent:#e8a020;--accent-dim:#7a4800;
+  --blue:#5b9bd5;--purple:#a78bfa;--green:#4ade80;--red:#f87171;--teal:#34d399;
+  --txt:#f0f0f0;--txt2:#aaa;--txt3:#666;--txt4:#444;
+  --check:26px;--radius:12px;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;font-size:15px;min-height:100vh;padding-bottom:80px;overscroll-behavior:none}
+
+/* ── Header ── */
+#header{background:var(--surf);padding:12px 16px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.h-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.h-cycle{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600}
+.h-phase{font-size:11px;color:var(--txt3)}
+.week-nav{display:flex;align-items:center;gap:8px}
+.nav-btn{background:var(--surf2);border:1px solid var(--border2);color:var(--txt);width:40px;height:40px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation}
+.nav-btn:disabled{opacity:.25}
+.nav-btn:active{background:var(--surf3)}
+.week-info{flex:1;text-align:center}
+.week-label{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.week-sub{font-size:11px;color:var(--txt2);margin-top:1px}
+.week-dots{display:flex;justify-content:center;gap:5px;margin-top:8px;flex-wrap:wrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s}
+.dot.active{background:var(--accent);transform:scale(1.3)}
+.dot.done{background:var(--green)}
+.dot.transition{background:var(--purple)}
+
+/* ── Tabs ── */
+#tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;color:var(--txt3);background:none;border:none;font-size:10px;text-transform:uppercase;letter-spacing:.08em;gap:3px;touch-action:manipulation}
+.tab.active{color:var(--accent)}
+.tab-icon{font-size:20px}
+
+/* ── Tab views ── */
+.view{display:none;padding:12px 12px 0}
+.view.active{display:block}
+#view-history{display:none;padding:12px}
+#view-history.active{display:block}
+#view-recovery{display:none;padding:12px}
+#view-recovery.active{display:block}
+
+/* ── Week goals banner ── */
+.goals-banner{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.goals-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px;font-weight:600}
+.goals-text{font-size:13px;color:var(--txt2);line-height:1.55;margin-bottom:6px}
+.goals-text:last-child{margin-bottom:0}
+.weights-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.w-badge{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.w-lift{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2)}
+.w-val{font-size:22px;font-weight:800;color:var(--accent);line-height:1.1;margin-top:2px}
+.w-unit{font-size:10px;color:var(--txt3)}
+
+/* ── Session card ── */
+.session-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.session-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;touch-action:manipulation;user-select:none}
+.session-head:active{background:var(--surf2)}
+.sh-left{}
+.sh-day{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin-bottom:3px}
+.sh-title{font-size:16px;font-weight:700;line-height:1.2}
+.sh-sub{font-size:12px;color:var(--txt2);margin-top:2px}
+.sh-badge{display:inline-block;background:#1e1200;border:1px solid var(--accent-dim);color:var(--accent);font-size:10px;padding:2px 7px;border-radius:20px;margin-top:4px;font-weight:600;letter-spacing:.05em}
+.sh-badge.redo{background:#1a1025;border-color:#5b2f8c;color:var(--purple)}
+.sh-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sh-pct{font-size:12px;color:var(--txt2)}
+.sh-chevron{color:var(--txt4);font-size:20px;transition:transform .2s}
+.session-card.open .sh-chevron{transform:rotate(180deg)}
+.prog-bar{height:3px;background:var(--border)}
+.prog-fill{height:100%;background:var(--accent);transition:width .3s}
+.prog-fill.full{background:var(--green)}
+
+/* ── Session body ── */
+.session-body{display:none;padding:0 14px 14px}
+.session-card.open .session-body{display:block}
+
+.date-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:12px}
+.date-lbl{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;font-weight:500}
+.date-inp{background:var(--surf2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;padding:7px 10px;font-size:14px;flex:1;min-width:0}
+.date-inp:focus{outline:none;border-color:var(--accent)}
+
+/* ── Sections ── */
+.section{margin-bottom:14px}
+.sec-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-top:2px;font-weight:600}
+.sec-title.warmup{color:var(--txt2)}
+.sec-title.lift{color:var(--blue)}
+.sec-title.finisher{color:var(--purple)}
+.sec-title.cooldown{color:var(--teal)}
+.sec-title.mobility{color:var(--teal)}
+.sec-title.core{color:var(--purple)}
+.sec-title.check{color:var(--green)}
+.sec-note{font-size:12px;color:var(--txt2);background:var(--surf2);border-left:2px solid var(--border2);padding:7px 10px;border-radius:0 8px 8px 0;margin-bottom:8px;line-height:1.5;font-style:italic}
+.sec-note.accent{border-color:var(--accent);color:var(--txt2)}
+.sec-note.personal{border-color:var(--purple);color:var(--purple);background:#160f22;font-style:normal}
+
+/* ── Check items ── */
+.ci{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid #1c1c1c;cursor:pointer;touch-action:manipulation;user-select:none;min-height:44px}
+.ci:last-child{border-bottom:none}
+.ci.done .ci-text{color:var(--txt4);text-decoration:line-through}
+.ci-box{width:var(--check);height:var(--check);min-width:var(--check);border-radius:7px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:1px;transition:all .15s;flex-shrink:0}
+.ci.done .ci-box{background:var(--green);border-color:var(--green);color:#000}
+.ci-body{flex:1}
+.ci-text{line-height:1.45;font-size:14px}
+.ci-note{font-size:12px;color:var(--txt3);margin-top:3px;line-height:1.4;font-style:italic}
+
+/* Sub-labels within sections (non-checkable) */
+.sub-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);padding:8px 0 4px;border-top:1px solid #1a1a1a;margin-top:4px;font-weight:600}
+.sub-label:first-child{border-top:none;margin-top:0}
+
+/* ── History ── */
+.hist-empty{text-align:center;padding:60px 20px;color:var(--txt3)}
+.hist-empty-icon{font-size:40px;margin-bottom:12px}
+.hist-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.hist-date{font-size:11px;color:var(--txt3);margin-bottom:3px}
+.hist-title{font-size:15px;font-weight:700;margin-bottom:3px}
+.hist-sub{font-size:13px;color:var(--txt2);margin-bottom:8px}
+.hist-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.hist-fill{height:100%;background:var(--green);border-radius:2px}
+.hist-stat{font-size:12px;color:var(--txt2);margin-top:4px}
+.hist-clear-btn{background:none;border:1px solid var(--border2);color:var(--txt3);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;display:block;margin:0 auto 16px;touch-action:manipulation}
+.hist-clear-btn:active{background:var(--surf2)}
+
+/* ── Recovery Guide ── */
+.rec-section{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.rec-h{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.rec-block{margin-bottom:12px}
+.rec-block-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);font-weight:600;margin-bottom:8px}
+.rec-rule{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #1a1a1a;align-items:flex-start}
+.rec-rule:last-child{border-bottom:none}
+.rec-bullet{color:var(--accent);font-weight:700;flex-shrink:0;font-size:14px;margin-top:1px}
+.rec-rule-text{font-size:14px;color:var(--txt);line-height:1.5}
+.rec-outcome{background:#0d1a0d;border:1px solid #1f4d1f;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--green);font-weight:500;line-height:1.4}
+.rec-important{background:#1a1100;border:1px solid var(--accent-dim);border-radius:10px;padding:14px;margin-bottom:12px}
+.rec-imp-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:8px}
+.rec-imp-text{font-size:14px;line-height:1.6;color:var(--txt)}
+.rec-imp-text li{margin-left:16px;margin-bottom:4px;color:var(--txt2)}
+.rec-imp-text li:last-child{margin-bottom:0}
+
+/* ── Misc ── */
+.divider{height:1px;background:var(--border);margin:8px 0}
+
+/* ── Weight Editor Badges ── */
+.w-badge.editable{cursor:pointer;position:relative}
+.w-badge.editable:active{opacity:.7;transform:scale(.97)}
+.w-edit-hint{font-size:9px;color:var(--txt4);margin-top:1px}
+.w-badge.custom-wt .w-val{color:var(--teal)}
+.w-badge.custom-wt{border-color:#1f4d3a}
+
+/* ── Set Notes (per item) ── */
+.set-note-area{padding:2px 0 8px 38px;border-bottom:1px solid #1c1c1c}
+.tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.set-tag{font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--surf2);color:var(--txt3);cursor:pointer;touch-action:manipulation}
+.set-tag.easy{background:#0d1f0d;border-color:#2d5a2d;color:#4ade80}
+.set-tag.good{background:#0d1525;border-color:#1e3d5c;color:#5b9bd5}
+.set-tag.tough{background:#1f1400;border-color:#5c3d00;color:#e8a020}
+.set-tag.failed{background:#1f0d0d;border-color:#5c1f1f;color:#f87171}
+.set-tag.sel{border-width:2px;font-weight:700}
+.set-note-txt{background:var(--surf2);border:1px solid var(--border2);color:var(--txt);border-radius:6px;padding:5px 9px;font-size:12px;width:100%;margin-top:4px;font-family:inherit}
+.set-note-txt:focus{outline:none;border-color:var(--accent)}
+.ci-tag-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:10px;margin-top:3px;font-weight:600}
+.ci-tag-badge.easy{background:#0d1f0d;color:#4ade80}
+.ci-tag-badge.good{background:#0d1525;color:#5b9bd5}
+.ci-tag-badge.tough{background:#1f1400;color:#e8a020}
+.ci-tag-badge.failed{background:#1f0d0d;color:#f87171}
+.ci-expand-note{color:var(--txt4);font-size:12px;margin-left:4px;cursor:pointer;touch-action:manipulation}
+
+/* ── Plate Calculator Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:82vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:16px}
+.plate-input-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.plate-input-row label{font-size:13px;color:var(--txt2);flex-shrink:0;width:100px}
+.plate-num-input{background:var(--surf2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;padding:8px 12px;font-size:20px;font-weight:700;flex:1;text-align:center;-moz-appearance:textfield}
+.plate-num-input:focus{outline:none;border-color:var(--accent)}
+.plate-num-input::-webkit-outer-spin-button,.plate-num-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.plate-result{background:var(--surf2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.plate-result-title{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600}
+.plates-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
+.plate-side-label{font-size:11px;color:var(--txt3);width:100%;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.plate-chip{padding:5px 10px;border-radius:8px;font-size:14px;font-weight:700}
+.plate-chip.p45{background:#1a1000;border:1px solid #6b3500;color:#e8a020}
+.plate-chip.p35{background:#0d1525;border:1px solid #1e3d5c;color:#5b9bd5}
+.plate-chip.p25{background:#0f1f0d;border:1px solid #2d5a2d;color:#4ade80}
+.plate-chip.p10{background:#1a0d1f;border:1px solid #4a2060;color:#a78bfa}
+.plate-chip.p5{background:#1a1515;border:1px solid #5c2f2f;color:#f87171}
+.plate-chip.p2{background:#181818;border:1px solid #3a3a3a;color:#aaa}
+.plate-total-bar{font-size:13px;color:var(--txt2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.plate-calc-btn{background:var(--surf2);border:1px solid var(--border2);border-radius:7px;padding:4px 8px;font-size:12px;cursor:pointer;color:var(--accent);touch-action:manipulation;display:inline-flex;align-items:center;gap:3px;flex-shrink:0;margin-left:6px}
+.plate-calc-btn:active{opacity:.7}
+.modal-close-row{margin-top:14px;text-align:center}
+.modal-close-row button{background:var(--surf2);border:1px solid var(--border2);color:var(--txt2);border-radius:10px;padding:10px 24px;font-size:14px;cursor:pointer}
+
+/* ── Rest Timer ── */
+.rest-timer{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom,0px));left:0;right:0;background:var(--surf);border-top:1px solid var(--border);padding:9px 14px 9px 16px;z-index:150;display:none;align-items:center;gap:10px}
+.rest-timer.visible{display:flex}
+.rt-left{flex-shrink:0}
+.rt-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px}
+.rt-time{font-size:26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.rt-time.done{color:var(--green)}
+.rt-presets{display:flex;gap:5px}
+.rt-preset{background:var(--surf2);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;font-size:12px;color:var(--txt2);cursor:pointer;touch-action:manipulation}
+.rt-preset.sel{border-color:var(--accent);color:var(--accent)}
+.rt-preset:active{opacity:.7}
+.rt-btn{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;touch-action:manipulation;flex-shrink:0}
+.rt-btn:active{opacity:.7}
+.rt-close{color:var(--txt3);font-size:18px;cursor:pointer;padding:0 2px;touch-action:manipulation;flex-shrink:0}
+
+/* ── Today Banner ── */
+.today-banner{background:linear-gradient(135deg,#1a1000,#1f1500);border:1px solid var(--accent-dim);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:manipulation;user-select:none}
+.today-banner:active{opacity:.8}
+.today-icon{font-size:22px;flex-shrink:0}
+.today-text{}
+.today-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600}
+.today-session{font-size:14px;font-weight:700;margin-top:2px;color:var(--txt)}
+.today-arrow{color:var(--txt3);font-size:18px;margin-left:auto;flex-shrink:0}
+
+/* ── Session Note ── */
+.session-note-wrap{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.session-note-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:6px;font-weight:600}
+.session-note-input{background:var(--surf2);border:1px solid var(--border2);color:var(--txt);border-radius:8px;padding:9px 12px;font-size:14px;width:100%;min-height:68px;resize:vertical;font-family:inherit;line-height:1.45}
+.session-note-input:focus{outline:none;border-color:var(--accent)}
+
+/* ── History Chart ── */
+.hist-chart-wrap{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;overflow:hidden}
+.hist-chart-hd{font-size:13px;font-weight:700;margin-bottom:10px}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2)}
+.chart-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chart-empty{font-size:13px;color:var(--txt3);text-align:center;padding:12px 0}
+
+/* ── Warmup Quick Complete ── */
+.sec-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-top:2px}
+.sec-hd-row .sec-title{margin-bottom:0;padding-top:0}
+.wu-all-btn{font-size:11px;background:var(--surf2);border:1px solid var(--border2);color:var(--green);border-radius:6px;padding:3px 8px;cursor:pointer;touch-action:manipulation;font-weight:600}
+.wu-all-btn:active{opacity:.7}
+.wu-all-btn.done-all{color:var(--txt3);border-color:var(--border);background:none}
+
+/* ── Weight Edit Modal ── */
+.weight-edit-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:70vh;overflow-y:auto}
+.weight-edit-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.weight-edit-row:last-of-type{border-bottom:none}
+.weight-edit-label{font-size:13px;color:var(--txt2);width:65px;flex-shrink:0}
+.weight-stepper{display:flex;align-items:center}
+.stepper-btn{width:36px;height:36px;background:var(--surf2);border:1px solid var(--border2);color:var(--txt);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;flex-shrink:0}
+.stepper-btn:first-child{border-radius:8px 0 0 8px}
+.stepper-btn:last-child{border-radius:0 8px 8px 0}
+.stepper-btn:active{background:var(--surf3)}
+.stepper-val{background:var(--surf2);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);border-left:none;border-right:none;color:var(--txt);font-size:16px;font-weight:700;width:60px;text-align:center;height:36px;padding:0;-moz-appearance:textfield}
+.stepper-val:focus{outline:none}
+.stepper-val::-webkit-outer-spin-button,.stepper-val::-webkit-inner-spin-button{-webkit-appearance:none}
+.apply-future-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--border);margin-top:4px}
+.af-toggle{width:40px;height:22px;background:var(--border2);border-radius:11px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;touch-action:manipulation}
+.af-toggle.on{background:var(--accent)}
+.af-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.af-toggle.on::after{transform:translateX(18px)}
+.af-label{font-size:13px;color:var(--txt2)}
+.wt-save-btn{background:var(--accent);color:#000;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;width:100%;cursor:pointer;margin-top:12px;touch-action:manipulation}
+.wt-save-btn:active{opacity:.8}
+.wt-cancel-btn{background:var(--surf2);color:var(--txt2);border:1px solid var(--border2);border-radius:10px;padding:10px;font-size:14px;width:100%;cursor:pointer;margin-top:8px;touch-action:manipulation}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <div class="h-top">
+    <div class="h-cycle">2026 Cycle 1 — Strength Build</div>
+    <div class="h-phase" id="phase-label"></div>
+  </div>
+  <div class="week-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changeWeek(-1)">‹</button>
+    <div class="week-info">
+      <div class="week-label" id="week-label">Week 1</div>
+      <div class="week-sub" id="week-sub">9 weeks</div>
+    </div>
+    <button class="nav-btn" id="btn-next" onclick="changeWeek(1)">›</button>
+  </div>
+  <div class="week-dots" id="week-dots"></div>
+</div>
+
+<!-- Tab Bar -->
+<div id="tabbar">
+  <button class="tab active" id="tab-workout" onclick="switchTab('workout')">
+    <span class="tab-icon">🏋️</span>Workout
+  </button>
+  <button class="tab" id="tab-history" onclick="switchTab('history')">
+    <span class="tab-icon">📋</span>History
+  </button>
+  <button class="tab" id="tab-calis" onclick="switchTab('calis')">
+    <span class="tab-icon">🤸</span>Calis
+  </button>
+  <button class="tab" id="tab-recovery" onclick="switchTab('recovery')">
+    <span class="tab-icon">🔄</span>Recovery
+  </button>
+</div>
+
+<!-- Workout Tab -->
+<div class="view active" id="view-workout">
+  <div id="today-banner-slot"></div>
+  <div id="week-goals"></div>
+  <div id="sessions-container"></div>
+</div>
+
+<!-- History Tab -->
+<div id="view-history">
+  <div id="history-content"></div>
+</div>
+
+<!-- Calisthenics Tab -->
+<div id="view-calis" style="display:none;padding:12px">
+  <div id="calis-content"></div>
+</div>
+
+<!-- Recovery Guide Tab -->
+<div id="view-recovery">
+  <div id="recovery-content"></div>
+</div>
+
+<!-- Plate Calculator Modal -->
+<div class="modal-overlay" id="plate-modal" onclick="closePlateModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏋️ Plate Calculator</div>
+    <div class="plate-input-row">
+      <label>Target weight</label>
+      <input type="number" class="plate-num-input" id="plate-input" value="225" oninput="calcPlates()" step="5" min="45" max="999" />
+    </div>
+    <div class="plate-result" id="plate-result">
+      <div class="plate-result-title">Per Side (45 lb bar)</div>
+      <div id="plate-chips"></div>
+      <div class="plate-total-bar"><span id="plate-total-txt"></span></div>
+    </div>
+    <div class="modal-close-row"><button onclick="closePlateModal()">Done</button></div>
+  </div>
+</div>
+
+<!-- Weight Edit Modal -->
+<div class="modal-overlay" id="weight-modal" onclick="closeWeightModal(event)">
+  <div class="weight-edit-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Weights — Week <span id="we-week-num"></span></div>
+    <div id="we-fields"></div>
+    <div class="apply-future-row">
+      <div class="af-toggle" id="af-toggle" onclick="toggleAF()"></div>
+      <div class="af-label">Apply changes to future weeks too</div>
+    </div>
+    <button class="wt-save-btn" onclick="saveWeightEdit()">Save</button>
+    <button class="wt-cancel-btn" onclick="closeWeightModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Rest Timer -->
+<div class="rest-timer" id="rest-timer">
+  <div class="rt-left">
+    <div class="rt-label">Rest</div>
+    <div class="rt-time" id="rt-display">2:00</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+    <div class="rt-presets">
+      <button class="rt-preset" onclick="setRestPreset(60)">1:00</button>
+      <button class="rt-preset" onclick="setRestPreset(90)">1:30</button>
+      <button class="rt-preset sel" id="rtp-120" onclick="setRestPreset(120)">2:00</button>
+      <button class="rt-preset" id="rtp-180" onclick="setRestPreset(180)">3:00</button>
+    </div>
+  </div>
+  <div class="rt-btn" id="rt-playbtn" onclick="toggleRestTimer()">▶</div>
+  <div class="rt-close" onclick="hideRestTimer()">✕</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+const ci = (id, text, note) => ({id, text, ...(note ? {note} : {})});
+const infoItem = (id, text) => ({id, text, info: true});
+
+// Standard calisthenics Day 6 warmup (weeks 3-9)
+function calisWarmup(p) {
+  return {title:"Full Calisthenics Warmup", type:"warmup", items:[
+    ci(`${p}wu1`,"Hip standing split stretch — 30s/side","Step one leg back, torso tall, feel stretch in front hip"),
+    ci(`${p}wu2`,"Standing frog stretch — 30 seconds","Feet wide, toes slightly out, gently sit hips down"),
+    ci(`${p}wu3`,"Narrow shoulder rolls — 10 forward, 10 backward"),
+    ci(`${p}wu4`,"Wide shoulder rolls — 10 forward, 10 backward"),
+    ci(`${p}wu5`,"Wrist circles — 10 each direction"),
+    ci(`${p}wu6`,"Band pull-aparts — 20 reps"),
+    ci(`${p}wu7`,"Jump rope — 2 minutes at easy pace"),
+    ci(`${p}wu8`,"Standing toe touches — 10 slow reps"),
+  ]};
+}
+
+// Standard calisthenics Day 6 workout (weeks 3-9)
+function calisDay6Workout(p) {
+  return {title:"Calisthenics Workout (Day 6)", type:"lift", items:[
+    ci(`${p}w1`,"Pull-ups or band pull-up — descending ladder 10s to 1"),
+    ci(`${p}w2`,"Floor assisted lat flies — 5 reps × 3 sets"),
+    ci(`${p}w3`,"High bar shrugs — 5 reps × 3 sets"),
+    ci(`${p}w4`,"Front & face band pulls — 10 reps × 3 sets"),
+    ci(`${p}w5`,"Plank variation — superset 1 — 30s × 3 sets"),
+    ci(`${p}w6`,"Shoulder taps — superset 1 — 30s × 3 sets (alternate)"),
+    ci(`${p}w7`,"Tricep band pulls — 20s × 3 sets"),
+    ci(`${p}w8`,"Squats — 1 min × 3 sets"),
+    ci(`${p}w9`,"Elevated hip raises — 20s × 3 sets"),
+    ci(`${p}w10`,"High bar knee raises — 10 reps"),
+    ci(`${p}w11`,"P bar knee raises — 10 reps"),
+    ci(`${p}w12`,"Straight and lateral flutter kicks — 10 straight, 10 lateral"),
+    ci(`${p}w13`,"Floor hollow hold — 30s × 2 sets"),
+  ]};
+}
+
+function calisAddOn(p) {
+  return {title:"Calisthenics Add-On", type:"finisher", items:[
+    ci(`${p}ao1`,"Classic push-ups — ladder from 10 down to 1"),
+    ci(`${p}ao2`,"Box dips — ladder from 10 down to 1"),
+  ]};
+}
+
+function calisPostMob(p) {
+  return {title:"Post-Calisthenics Mobility", type:"mobility", items:[
+    ci(`${p}m1`,"90–90 hip stretch — 10 slow rotations per side"),
+    ci(`${p}m2`,"Wall shoulder opener — 60 seconds","Hands on wall, hinge hips back, chest toward floor"),
+    ci(`${p}m3`,"Child's pose breathing — 2 minutes","Slow nasal breaths"),
+  ]};
+}
+
+// Standard Lift A Warmup (weeks 2-9 Monday)
+function liftAWarmup(p) {
+  return {title:"Warmup", type:"warmup", items:[
+    ci(`${p}wu1`,"Walk or bike at easy pace — 5 minutes"),
+    ci(`${p}wu2`,"Standing toe touches — 10 slow reps","Hinge at hips, knees soft, arms relaxed"),
+    ci(`${p}wu3`,"Hip circles — 10 clockwise, 10 counterclockwise","Hands on hips, controlled movement"),
+    ci(`${p}wu4`,"Narrow shoulder rolls — 10 forward, 10 backward"),
+    ci(`${p}wu5`,"Wide shoulder rolls — 10 forward, 10 backward"),
+  ]};
+}
+
+// Standard Lift B Warmup (weeks 2-9 Friday)
+function liftBWarmup(p) {
+  return {title:"Warmup", type:"warmup", items:[
+    ci(`${p}wu1`,"Walk or bike — 5 minutes"),
+    ci(`${p}wu2`,"Hip hinges — 15 reps","Hands on thighs, push hips back"),
+    ci(`${p}wu3`,"Glute bridges — 15 reps","Pause briefly at top"),
+    ci(`${p}wu4`,"Band pull-aparts — 20 reps"),
+  ]};
+}
+
+// Standard squat section (weeks 4-9)
+function squatSection(p, wt) {
+  const close = Math.round(wt * 0.91 / 5) * 5;
+  return {title:`Back Squat — ${wt} lb`, type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+    {id:`${p}sq-lbl1`, text:"Warmup Sets", sublabel:true},
+    ci(`${p}sq1`,"Bar × 10 reps"),
+    ci(`${p}sq2`,"95 × 5 reps"),
+    ci(`${p}sq3`,"135 × 5 reps"),
+    ci(`${p}sq4`,"185 × 3 reps"),
+    ci(`${p}sq5`,`${close} × 1 rep`),
+    {id:`${p}sq-lbl2`, text:"Working Sets", sublabel:true},
+    ci(`${p}sq6`,`${wt} × 5 reps`),
+    ci(`${p}sq7`,`${wt} × 5 reps`),
+    ci(`${p}sq8`,`${wt} × 5 reps`),
+  ]};
+}
+
+// Standard bench section (weeks 4-9)
+function benchSection(p, wt) {
+  const close = Math.round(wt * 0.94 / 5) * 5;
+  return {title:`Bench Press — ${wt} lb`, type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+    {id:`${p}bp-lbl1`, text:"Warmup Sets", sublabel:true},
+    ci(`${p}bp1`,"Bar × 10 reps"),
+    ci(`${p}bp2`,"95 × 5 reps"),
+    ci(`${p}bp3`,"115 × 5 reps"),
+    ci(`${p}bp4`,"135 × 3 reps"),
+    ci(`${p}bp5`,`${close} × 1 rep`),
+    {id:`${p}bp-lbl2`, text:"Working Sets", sublabel:true},
+    ci(`${p}bp6`,`${wt} × 5 reps`),
+    ci(`${p}bp7`,`${wt} × 5 reps`),
+    ci(`${p}bp8`,`${wt} × 5 reps`),
+  ]};
+}
+
+// Standard Lift A finishers (weeks 2-9)
+function liftAFinishers(p) {
+  return {title:"Light Finishers", type:"finisher", items:[
+    ci(`${p}fin1`,"Band pull-aparts — 15 reps","Hold band at chest, pull apart, squeeze shoulder blades"),
+    ci(`${p}fin2`,"Band pull-aparts — 15 reps"),
+    ci(`${p}fin3`,"Dead hang — 30 seconds","Relax shoulders, breathe slowly"),
+    ci(`${p}fin4`,"Dead hang — 30 seconds"),
+    ci(`${p}fin5`,"Hanging knee raises — 10 reps"),
+    ci(`${p}fin6`,"Hanging knee raises — 10 reps"),
+  ]};
+}
+
+// Standard Lift A mobility/breathing (weeks 2-9)
+function liftAMobility(p) {
+  return {title:"Mobility & Breathing", type:"mobility", items:[
+    ci(`${p}mob1`,"Kneeling hip flexor stretch — 60s/side","Back knee down, squeeze glute, push hips forward"),
+    ci(`${p}mob2`,"Standing hamstring stretch — 60s/side","Hinge forward with flat back"),
+    ci(`${p}mob3`,"Cross-body shoulder stretch — 30s/side"),
+    ci(`${p}mob4`,"Supine nasal breathing — 3 minutes","Inhale nose 4s · Exhale nose 6s"),
+  ]};
+}
+
+// Standard deadlift section
+function deadliftSection(p, wt, note) {
+  return {title:`Deadlift — ${wt} lb`, type:"lift", note: note || "Rest 3 minutes before the working set", items:[
+    {id:`${p}dl-lbl1`, text:"Warmup Sets", sublabel:true},
+    ci(`${p}dl1`,"135 × 5 reps"),
+    ci(`${p}dl2`,"185 × 5 reps"),
+    ci(`${p}dl3`,"225 × 3 reps"),
+    ci(`${p}dl4`,"275 × 1 rep"),
+    ci(`${p}dl5`,"305 × 1 rep"),
+    {id:`${p}dl-lbl2`, text:"Working Set (1 set)", sublabel:true},
+    ci(`${p}dl6`,`${wt} × 5 reps`),
+  ]};
+}
+
+// Standard OHP section
+function ohpSection(p, wt) {
+  return {title:`Overhead Press — ${wt} lb`, type:"lift", note:"Rest 2–3 minutes between sets", items:[
+    {id:`${p}ohp-lbl1`, text:"Warmup Sets", sublabel:true},
+    ci(`${p}ohp1`,"Bar × 10 reps"),
+    ci(`${p}ohp2`,"65 × 5 reps"),
+    ci(`${p}ohp3`,"80 × 2 reps"),
+    {id:`${p}ohp-lbl2`, text:"Working Sets", sublabel:true},
+    ci(`${p}ohp4`,`${wt} × 5 reps`),
+    ci(`${p}ohp5`,`${wt} × 5 reps`),
+    ci(`${p}ohp6`,`${wt} × 5 reps`),
+  ]};
+}
+
+// Standard Lift B stability/core
+function liftBCore(p) {
+  return {title:"Stability & Core", type:"core", items:[
+    ci(`${p}core1`,"Farmer carries — 40 seconds","Walk tall, ribs down"),
+    ci(`${p}core2`,"Farmer carries — 40 seconds"),
+    ci(`${p}core3`,"Side plank — 30s/side × 1"),
+    ci(`${p}core4`,"Side plank — 30s/side × 1"),
+  ]};
+}
+
+// Standard Lift B cooldown
+function liftBCooldown(p) {
+  return {title:"Cooldown", type:"cooldown", items:[
+    ci(`${p}cd1`,"Couch stretch — 60s/side"),
+    ci(`${p}cd2`,"Passive hang — 30 seconds"),
+    ci(`${p}cd3`,"Crocodile breathing — 2 minutes","Lie face down, breathe into belly and ribs"),
+  ]};
+}
+
+// Standard weekend yoga (weeks 3-9)
+function stdYoga(p, subtitle) {
+  return [{title:`Full Body Yoga${subtitle ? ' — ' + subtitle : ''}`, type:"cooldown", items:[
+    ci(`${p}y1`,"Stand tall, slow nasal breathing — 1 minute"),
+    ci(`${p}y2`,"Forward fold — 60 seconds"),
+    ci(`${p}y3`,"Half lift — 5 slow breaths"),
+    ci(`${p}y4`,"Step back to plank — 20 seconds"),
+    ci(`${p}y5`,"Lower to floor slowly"),
+    ci(`${p}y6`,"Cobra stretch — 30 seconds"),
+    ci(`${p}y7`,"Child's pose — 60 seconds"),
+    ci(`${p}y8`,"Downward dog — 60 seconds"),
+    ci(`${p}y9`,"Low lunge — 60s/side"),
+    ci(`${p}y10`,"Pigeon or seated figure-4 — 60s/side"),
+    ci(`${p}y11`,"Seated hamstring stretch — 60s/side"),
+    ci(`${p}y12`,"Lie on back, nasal breathing — 3 minutes"),
+  ]}];
+}
+
+// Standard week-end check
+function weekCheck(p, items) {
+  return {title:"End of Week Check", type:"check", items: items.map((t,i) => ci(`${p}chk${i+1}`, t))};
+}
+
+// ═══════════════════════════════════════════════
+//  WORKOUT DATA
+// ═══════════════════════════════════════════════
+const WEEKS = [
+
+// ────────────────────────────────────────────────
+// WEEK 1
+// ────────────────────────────────────────────────
+{
+  num:1, label:"Week 1", phase:"Hold Weights Steady",
+  weights:{squat:225, bench:165, deadlift:315, press:85},
+  goals:["Groove barbell patterns at starting weights","Establish warmup and cooldown habits","Low mental load — just show up and move"],
+  sessions:[
+    {
+      id:"w1-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w1m-wu1","Walk or bike 5 min"),
+          ci("w1m-wu2","Standing toe touches × 10"),
+          ci("w1m-wu3","Hip circles × 10 each direction"),
+          ci("w1m-wu4","Narrow shoulder rolls × 10"),
+          ci("w1m-wu5","Wide shoulder rolls × 10"),
+        ]},
+        {title:"Back Squat — 225 lb", type:"lift", items:[
+          {id:"w1m-sq-l1", text:"Working Sets", sublabel:true},
+          ci("w1m-sq1","225 × 5"),
+          ci("w1m-sq2","225 × 5"),
+          ci("w1m-sq3","225 × 5"),
+          {id:"w1m-sq-l2", text:"Drop Sets", sublabel:true},
+          ci("w1m-sq4","205 × 1"),
+          ci("w1m-sq5","185 × 3"),
+          ci("w1m-sq6","135 × 5"),
+          ci("w1m-sq7","95 × 5"),
+          ci("w1m-sq8","Bar × 10"),
+        ]},
+        {title:"Bench Press — 165 lb", type:"lift", items:[
+          {id:"w1m-bp-l1", text:"Working Sets", sublabel:true},
+          ci("w1m-bp1","165 × 5"),
+          ci("w1m-bp2","165 × 5"),
+          ci("w1m-bp3","165 × 5"),
+          {id:"w1m-bp-l2", text:"Drop Sets", sublabel:true},
+          ci("w1m-bp4","155 × 1"),
+          ci("w1m-bp5","135 × 3"),
+          ci("w1m-bp6","115 × 5"),
+          ci("w1m-bp7","95 × 5"),
+          ci("w1m-bp8","Bar × 10"),
+        ]},
+        {title:"Finishers", type:"finisher", items:[
+          ci("w1m-fin1","Hanging knee raises 10 × 2"),
+          ci("w1m-fin2","Dead hang 30s × 2"),
+          ci("w1m-fin3","Band pull-aparts 15 × 2"),
+        ]},
+        {title:"Cooldown", type:"cooldown", items:[
+          ci("w1m-cd1","Supine nasal breathing 3 min"),
+          ci("w1m-cd2","Cross-body shoulder stretch 30s/side"),
+          ci("w1m-cd3","Standing hamstring stretch 60s/side"),
+          ci("w1m-cd4","Kneeling hip flexor stretch 60s/side"),
+        ]},
+      ]
+    },
+    {
+      id:"w1-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 2",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w1w-wu1","Jump rope 2 min"),
+          ci("w1w-wu2","Standing toe touches × 10"),
+          ci("w1w-wu3","Band pull-aparts × 20"),
+          ci("w1w-wu4","Wrist circles × 10 each way"),
+          ci("w1w-wu5","Wide shoulder rolls × 10"),
+          ci("w1w-wu6","Narrow shoulder rolls × 10"),
+          ci("w1w-wu7","Standing frog stretch 30s"),
+          ci("w1w-wu8","Hip standing split stretch 30s/side"),
+        ]},
+        {title:"Workout", type:"lift", items:[
+          ci("w1w-w1","Flutter kicks 30s × 2"),
+          ci("w1w-w2","Superman hold 30s × 2"),
+          ci("w1w-w3","Dorsiflexion hold 30s × 2"),
+          ci("w1w-w4","Floor hollow hold 30s × 2"),
+          ci("w1w-w5","Elevated hip raises 20s reps / 10s hold × 4"),
+          ci("w1w-w6","Squats 20s reps / 10s hold × 4"),
+          ci("w1w-w7","Jump rope 20s slow / 10s fast × 8"),
+        ]},
+        {title:"Cooldown", type:"cooldown", items:[
+          ci("w1w-cd1","Child's pose breathing 2 min"),
+          ci("w1w-cd2","Wall shoulder opener 60s"),
+          ci("w1w-cd3","90-90 hips × 10/side"),
+        ]},
+      ]
+    },
+    {
+      id:"w1-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[
+        {title:"Warmup", type:"warmup", note:"Do calisthenics warmup too — especially wrist stretches", items:[
+          ci("w1f-wu1","Walk or bike 5 min"),
+          ci("w1f-wu2","Hip hinges × 15"),
+          ci("w1f-wu3","Glute bridges × 15"),
+          ci("w1f-wu4","Band pull-aparts × 20"),
+        ]},
+        {title:"Deadlift — 315 lb", type:"lift", items:[
+          ci("w1f-dl1","295 × 5 (if necessary)"),
+          ci("w1f-dl2","315 × 5"),
+          ci("w1f-dl3","275 × 1"),
+          ci("w1f-dl4","225 × 3"),
+          ci("w1f-dl5","185 × 5"),
+          ci("w1f-dl6","135 × 5"),
+        ]},
+        {title:"Overhead Press — 85 lb", type:"lift", items:[
+          ci("w1f-ohp1","85 × 5"),
+          ci("w1f-ohp2","85 × 5"),
+          ci("w1f-ohp3","85 × 5"),
+          ci("w1f-ohp4","65 × 5"),
+        ]},
+        {title:"Finishers", type:"finisher", items:[
+          ci("w1f-fin1","Side plank 30s/side × 2 (upright on wrist)"),
+          ci("w1f-fin2","Side plank 30s/side × 2 (on forearm)"),
+          ci("w1f-fin3","Farmer carries 40s × 2 (70 lb/hand)","Tried 100 each hand — too tough, scale back to 70"),
+        ]},
+        {title:"Cooldown", type:"cooldown", items:[
+          ci("w1f-cd1","Couch stretch 60s/side","Elevate back leg on something"),
+          ci("w1f-cd2","Passive hang 30s"),
+          ci("w1f-cd3","Crocodile breathing 2 min"),
+        ]},
+      ]
+    },
+    {
+      id:"w1-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:[
+        {title:"Full Body Yoga", type:"cooldown", items:[
+          ci("w1wk-1","Forward fold 60s"),
+          ci("w1wk-2","Half lift 5 breaths"),
+          ci("w1wk-3","Plank 20s"),
+          ci("w1wk-4","Cobra 30s"),
+          ci("w1wk-5","Child's pose 60s"),
+          ci("w1wk-6","Down dog 60s"),
+          ci("w1wk-7","Low lunge 60s/side"),
+          ci("w1wk-8","Pigeon or figure-4 60s/side"),
+          ci("w1wk-9","Seated hamstring stretch 60s/side"),
+          ci("w1wk-10","Supine breathing 3 min"),
+        ]},
+      ]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 2
+// ────────────────────────────────────────────────
+{
+  num:2, label:"Week 2", phase:"Hold Weights Steady",
+  weights:{squat:225, bench:170, deadlift:315, press:90},
+  goals:["Continue building barbell confidence","Bench moves to 170 lb","Keep calisthenics supportive"],
+  sessions:[
+    {
+      id:"w2-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[
+        liftAWarmup("w2m-"),
+        {title:"Back Squat — 225 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w2m-sq-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2m-sq1","205 × 1 rep"),
+          ci("w2m-sq2","185 × 3 reps"),
+          ci("w2m-sq3","135 × 5 reps"),
+          ci("w2m-sq4","95 × 5 reps"),
+          ci("w2m-sq5","Bar × 10 reps"),
+          {id:"w2m-sq-l2", text:"Working Sets", sublabel:true},
+          ci("w2m-sq6","225 × 5 reps"),
+          ci("w2m-sq7","225 × 5 reps"),
+          ci("w2m-sq8","225 × 5 reps"),
+        ]},
+        {title:"Bench Press — 170 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w2m-bp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2m-bp1","155 × 1"),
+          ci("w2m-bp2","135 × 3"),
+          ci("w2m-bp3","115 × 5"),
+          ci("w2m-bp4","95 × 5"),
+          ci("w2m-bp5","Bar × 10"),
+          {id:"w2m-bp-l2", text:"Working Sets", sublabel:true},
+          ci("w2m-bp6","170 × 5  (45, 10, 5, 2.5 each side)"),
+          ci("w2m-bp7","170 × 5"),
+          ci("w2m-bp8","170 × 5"),
+        ]},
+        liftAFinishers("w2m-"),
+        liftAMobility("w2m-"),
+      ]
+    },
+    {
+      id:"w2-mon2", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      badge:"Redo — 2/17/26", badgeType:"redo",
+      sections:[
+        liftAWarmup("w2m2-"),
+        {title:"Back Squat — 225 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w2m2-sq-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2m2-sq1","205 × 1 rep"),
+          ci("w2m2-sq2","185 × 3 reps"),
+          ci("w2m2-sq3","135 × 5 reps"),
+          ci("w2m2-sq4","95 × 5 reps"),
+          ci("w2m2-sq5","Bar × 10 reps"),
+          {id:"w2m2-sq-l2", text:"Working Sets", sublabel:true},
+          ci("w2m2-sq6","225 × 5 reps"),
+          ci("w2m2-sq7","225 × 5 reps"),
+          ci("w2m2-sq8","225 × 5 reps"),
+        ]},
+        {title:"Bench Press — 170 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w2m2-bp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2m2-bp1","155 × 1"),
+          ci("w2m2-bp2","135 × 3"),
+          ci("w2m2-bp3","115 × 5"),
+          ci("w2m2-bp4","95 × 5"),
+          ci("w2m2-bp5","Bar × 10"),
+          {id:"w2m2-bp-l2", text:"Working Sets", sublabel:true},
+          ci("w2m2-bp6","170 × 5"),
+          ci("w2m2-bp7","170 × 5"),
+          ci("w2m2-bp8","170 × 5"),
+        ]},
+        {title:"Finishers — Dips + Pull-ups", type:"finisher", items:[
+          {id:"w2m2-fin-l1", text:"Set 1", sublabel:true},
+          ci("w2m2-fin1","Dips × 5"),
+          ci("w2m2-fin2","Pull-ups × 3"),
+          {id:"w2m2-fin-l2", text:"Set 2", sublabel:true},
+          ci("w2m2-fin3","Dips × 5"),
+          ci("w2m2-fin4","Pull-ups × 3"),
+          {id:"w2m2-fin-l3", text:"Set 3", sublabel:true},
+          ci("w2m2-fin5","Dips × 5"),
+          ci("w2m2-fin6","Pull-ups × 3"),
+          {id:"w2m2-fin-l4", text:"Abs", sublabel:true},
+          ci("w2m2-fin7","Hanging knee raises — 10 reps"),
+          ci("w2m2-fin8","Hanging knee raises — 10 reps"),
+        ]},
+        liftAMobility("w2m2-"),
+      ]
+    },
+    {
+      id:"w2-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 4",
+      sections:[
+        {title:"Full Calisthenics Warmup", type:"warmup", items:[
+          ci("w2w-wu1","Hip standing split stretch — 30s/side"),
+          ci("w2w-wu2","Standing frog stretch — 30 seconds"),
+          ci("w2w-wu3","Narrow shoulder rolls — 10 forward, 10 backward"),
+          ci("w2w-wu4","Wide shoulder rolls — 10 forward, 10 backward"),
+          ci("w2w-wu5","Wrist circles — 10 each direction"),
+          ci("w2w-wu6","Band pull-aparts — 20 reps"),
+          ci("w2w-wu7","Jump rope — 2 minutes at easy pace"),
+          ci("w2w-wu8","Standing toe touches — 10 slow reps"),
+        ]},
+        {title:"Calisthenics Workout", type:"lift", items:[
+          ci("w2w-w1","Jump rope — 20s slow / 10s fast × 8 rounds"),
+          ci("w2w-w2","Classic push-ups — 20s AMRAP × 4 sets"),
+          ci("w2w-w3","Plank — 10 seconds × 4 sets"),
+          ci("w2w-w4","Front & face band pulls — 20s reps / 10s hold × 4 sets"),
+          ci("w2w-w5","Hanging knee raises — 30 seconds × 2 sets"),
+          ci("w2w-w6","Floor leg hold — 30 seconds × 2 sets","Lie on back, legs straight, hover above floor"),
+          ci("w2w-w7","Superman floor hold — 30 seconds × 2 sets"),
+          ci("w2w-w8","Floor hollow hold — 30 seconds × 2 sets"),
+        ]},
+        {title:"Post-Calisthenics Mobility", type:"mobility", items:[
+          ci("w2w-m1","90–90 hip stretch — 10 slow rotations per side"),
+          ci("w2w-m2","Wall shoulder opener — 60 seconds","Hands on wall, hinge hips back, chest toward floor"),
+          ci("w2w-m3","Child's pose breathing — 2 minutes"),
+        ]},
+      ]
+    },
+    {
+      id:"w2-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      badge:"2/21/26",
+      sections:[
+        liftBWarmup("w2f-"),
+        {title:"Deadlift — 315 lb", type:"lift",
+          personalNote:"Not feeling it today. Wrist gave out — only did 2 sets of 3 instead of 1 set of 5. Need to work back up to 315.",
+          note:"Rest 3 minutes between sets", items:[
+          {id:"w2f-dl-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2f-dl1","275 × 1 rep"),
+          ci("w2f-dl2","225 × 3 reps"),
+          ci("w2f-dl3","185 × 5 reps"),
+          ci("w2f-dl4","135 × 5 reps"),
+          {id:"w2f-dl-l2", text:"Working Sets", sublabel:true},
+          ci("w2f-dl5","315 × 3 reps"),
+          ci("w2f-dl6","315 × 3 reps"),
+        ]},
+        {title:"Overhead Press — 90 lb", type:"lift", items:[
+          {id:"w2f-ohp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w2f-ohp1","65 × 5 reps"),
+          ci("w2f-ohp2","Bar × 10 reps"),
+          {id:"w2f-ohp-l2", text:"Working Sets", sublabel:true},
+          ci("w2f-ohp3","90 × 5 reps"),
+          ci("w2f-ohp4","90 × 5 reps"),
+          ci("w2f-ohp5","90 × 5 reps"),
+        ]},
+        liftBCore("w2f-"),
+        liftBCooldown("w2f-"),
+      ]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 3
+// ────────────────────────────────────────────────
+{
+  num:3, label:"Week 3", phase:"Hold Weights Steady",
+  weights:{squat:225, bench:170, deadlift:315, press:85},
+  goals:["Continue grooving barbell lifts at current weights","Slightly increase calisthenics time-under-tension","Reinforce hips, shoulders, and trunk"],
+  sessions:[
+    {
+      id:"w3-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[
+        liftAWarmup("w3m-"),
+        {title:"Back Squat — 225 lb", type:"lift",
+          personalNote:"These felt really good — ate 1hr before and it helped I think.",
+          note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w3m-sq-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3m-sq1","205 × 1 rep"),
+          ci("w3m-sq2","185 × 3 reps"),
+          ci("w3m-sq3","135 × 5 reps"),
+          ci("w3m-sq4","95 × 5 reps","Did 6"),
+          ci("w3m-sq5","Bar × 10 reps"),
+          {id:"w3m-sq-l2", text:"Working Sets", sublabel:true},
+          ci("w3m-sq6","225 × 5 reps"),
+          ci("w3m-sq7","225 × 5 reps"),
+          ci("w3m-sq8","225 × 5 reps"),
+        ]},
+        {title:"Bench Press — 170 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w3m-bp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3m-bp1","160 × 1 rep"),
+          ci("w3m-bp2","135 × 3 reps"),
+          ci("w3m-bp3","115 × 5 reps"),
+          ci("w3m-bp4","95 × 5 reps"),
+          ci("w3m-bp5","Bar × 10 reps"),
+          {id:"w3m-bp-l2", text:"Working Sets", sublabel:true},
+          ci("w3m-bp6","170 × 5 reps"),
+          ci("w3m-bp7","170 × 5 reps"),
+          ci("w3m-bp8","170 × 5 reps"),
+        ]},
+        liftAFinishers("w3m-"),
+        liftAMobility("w3m-"),
+      ]
+    },
+    {
+      id:"w3-mon2", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      badge:"Repeat — 3/3/26", badgeType:"redo",
+      sections:[
+        liftAWarmup("w3m2-"),
+        {title:"Back Squat — 225 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w3m2-sq-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3m2-sq1","205 × 1 rep"),
+          ci("w3m2-sq2","185 × 3 reps"),
+          ci("w3m2-sq3","135 × 5 reps"),
+          ci("w3m2-sq4","95 × 5 reps","Did 6"),
+          ci("w3m2-sq5","Bar × 10 reps"),
+          {id:"w3m2-sq-l2", text:"Working Sets", sublabel:true},
+          ci("w3m2-sq6","225 × 5 reps"),
+          ci("w3m2-sq7","225 × 5 reps"),
+          ci("w3m2-sq8","225 × 5 reps"),
+        ]},
+        {title:"Bench Press — 170 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w3m2-bp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3m2-bp1","160 × 1 rep"),
+          ci("w3m2-bp2","135 × 3 reps"),
+          ci("w3m2-bp3","115 × 5 reps"),
+          ci("w3m2-bp4","95 × 5 reps"),
+          ci("w3m2-bp5","Bar × 10 reps"),
+          {id:"w3m2-bp-l2", text:"Working Sets", sublabel:true},
+          ci("w3m2-bp6","170 × 5 reps"),
+          ci("w3m2-bp7","170 × 5 reps"),
+          ci("w3m2-bp8","170 × 5 reps"),
+        ]},
+        liftAFinishers("w3m2-"),
+        liftAMobility("w3m2-"),
+      ]
+    },
+    {
+      id:"w3-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[
+        calisWarmup("w3w-"),
+        {title:"Calisthenics Workout (Day 6)", type:"lift", items:[
+          ci("w3w-w1","Pull-ups or band pull-up — descending ladder 10s to 1"),
+          ci("w3w-w2","Floor assisted lat flies — 5 reps × 3 sets"),
+          ci("w3w-w3","High bar shrugs — 5 reps × 3 sets"),
+          ci("w3w-w4","Front & face band pulls — 10 reps × 3 sets"),
+          ci("w3w-w5","Plank variation — superset 1 — 30s × 3 sets"),
+          ci("w3w-w6","Shoulder taps — superset 1 — 30s × 3 sets (alternate)"),
+          ci("w3w-w7","Tricep band pulls — 20s × 3 sets"),
+          ci("w3w-w8","Squats — 1 min × 3 sets"),
+          ci("w3w-w9","Elevated hip raises — 20s × 3 sets"),
+          ci("w3w-w10","High bar knee raises — 10 reps"),
+          ci("w3w-w11","P bar knee raises — 10 reps"),
+          ci("w3w-w12","Straight and lateral flutter kicks — 10 straight, 10 lateral"),
+          ci("w3w-w13","Floor hollow hold — 30s × 2 sets"),
+        ]},
+        calisAddOn("w3w-"),
+        calisPostMob("w3w-"),
+      ]
+    },
+    {
+      id:"w3-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      badge:"3/5/26",
+      sections:[
+        calisWarmup("w3f-"),
+        {title:"Deadlift — 315 lb", type:"lift", note:"Rest 3 min — treat the top set like the main event", items:[
+          {id:"w3f-dl-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3f-dl1","275 × 1 rep"),
+          ci("w3f-dl2","225 × 3 reps"),
+          ci("w3f-dl3","185 × 5 reps"),
+          ci("w3f-dl4","135 × 5 reps"),
+          {id:"w3f-dl-l2", text:"Working Set (1 set only)", sublabel:true},
+          ci("w3f-dl5","315 × 5 reps"),
+        ]},
+        {title:"Overhead Press — 90 lb", type:"lift", items:[
+          {id:"w3f-ohp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w3f-ohp1","65 × 5 reps"),
+          ci("w3f-ohp2","Bar × 10 reps"),
+          {id:"w3f-ohp-l2", text:"Working Sets", sublabel:true},
+          ci("w3f-ohp3","90 × 5 reps"),
+          ci("w3f-ohp4","90 × 5 reps"),
+          ci("w3f-ohp5","90 × 5 reps"),
+        ]},
+        {title:"Stability & Core", type:"core", items:[
+          ci("w3f-core1","65 lb Farmer carries — 40 seconds","Walk tall, ribs down"),
+          ci("w3f-core2","65 lb Farmer carries — 40 seconds"),
+          ci("w3f-core3","Side plank — 30s/side"),
+          ci("w3f-core4","Side plank — 30s/side"),
+        ]},
+        liftBCooldown("w3f-"),
+      ]
+    },
+    {
+      id:"w3-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections: stdYoga("w3wk-","No Thinking Version"),
+    },
+    {
+      id:"w3-check", day:"End of Week 3", type:"Week Check", subtitle:"Assess & Move On",
+      sections:[{title:"End of Week 3 Check", type:"check", items:[
+        ci("w3chk1","All lifts felt controlled"),
+        ci("w3chk2","No lingering joint pain"),
+        ci("w3chk3","Calisthenics did not interfere with lifting"),
+        ci("w3chk4","Ready to progress next block"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 4
+// ────────────────────────────────────────────────
+{
+  num:4, label:"Week 4", phase:"Begin Load Increases",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Begin second build phase with modest load increases","Maintain movement quality and recovery","Keep calisthenics supportive, not fatiguing"],
+  sessions:[
+    {
+      id:"w4-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      badge:"3/10/26",
+      sections:[
+        liftAWarmup("w4m-"),
+        {title:"Back Squat — 230 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w4m-sq-l1", text:"Warmup Sets", sublabel:true},
+          ci("w4m-sq1","Bar × 10 reps"),
+          ci("w4m-sq2","95 × 5 reps"),
+          ci("w4m-sq3","135 × 5 reps"),
+          ci("w4m-sq4","185 × 3 reps"),
+          ci("w4m-sq5","210 × 1 rep"),
+          {id:"w4m-sq-l2", text:"Working Sets", sublabel:true},
+          ci("w4m-sq6","230 × 5 reps"),
+          ci("w4m-sq7","230 × 5 reps"),
+          ci("w4m-sq8","230 × 5 reps"),
+        ]},
+        {title:"Bench Press — 170 lb", type:"lift", note:"Rest 2–3 minutes between working sets", items:[
+          {id:"w4m-bp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w4m-bp1","Bar × 10 reps"),
+          ci("w4m-bp2","95 × 5 reps"),
+          ci("w4m-bp3","115 × 5 reps"),
+          ci("w4m-bp4","135 × 3 reps"),
+          ci("w4m-bp5","160 × 1 rep"),
+          {id:"w4m-bp-l2", text:"Working Sets", sublabel:true},
+          ci("w4m-bp6","170 × 5 reps"),
+          ci("w4m-bp7","170 × 5 reps"),
+          ci("w4m-bp8","170 × 5 reps"),
+        ]},
+        {title:"Light Finishers", type:"finisher", items:[
+          ci("w4m-fin1","Band pull-aparts — 15 reps"),
+          ci("w4m-fin2","Band pull-aparts — 15 reps"),
+          ci("w4m-fin3","Leg raises — 10 reps"),
+          ci("w4m-fin4","Leg raises — 10 reps"),
+          ci("w4m-fin5","Hanging knee raises — 10 reps"),
+          ci("w4m-fin6","Hanging knee raises — 10 reps"),
+          ci("w4m-fin7","Dead hang — 30 seconds"),
+          ci("w4m-fin8","Dead hang — 30 seconds"),
+        ]},
+        liftAMobility("w4m-"),
+      ]
+    },
+    {
+      id:"w4-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w4w-"), calisDay6Workout("w4w-"), calisAddOn("w4w-"), calisPostMob("w4w-")]
+    },
+    {
+      id:"w4-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[
+        liftBWarmup("w4f-"),
+        {title:"Deadlift — 325 lb", type:"lift", note:"Rest 3 minutes before the working set", items:[
+          {id:"w4f-dl-l1", text:"Warmup Sets", sublabel:true},
+          ci("w4f-dl1","135 × 5 reps"),
+          ci("w4f-dl2","185 × 5 reps"),
+          ci("w4f-dl3","225 × 3 reps"),
+          ci("w4f-dl4","275 × 1 rep"),
+          ci("w4f-dl5","305 × 1 rep"),
+          {id:"w4f-dl-l2", text:"Working Set", sublabel:true},
+          ci("w4f-dl6","325 × 5 reps"),
+        ]},
+        {title:"Overhead Press — 90 lb", type:"lift", items:[
+          {id:"w4f-ohp-l1", text:"Warmup Sets", sublabel:true},
+          ci("w4f-ohp1","Bar × 10 reps"),
+          ci("w4f-ohp2","65 × 5 reps"),
+          ci("w4f-ohp3","80 × 2 reps"),
+          {id:"w4f-ohp-l2", text:"Working Sets", sublabel:true},
+          ci("w4f-ohp4","90 × 5 reps"),
+          ci("w4f-ohp5","90 × 5 reps"),
+          ci("w4f-ohp6","90 × 5 reps"),
+        ]},
+        liftBCore("w4f-"),
+        liftBCooldown("w4f-"),
+      ]
+    },
+    {id:"w4-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w4wk-","Recovery Bias")},
+    {id:"w4-check", day:"End of Week 4", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 4 Check", type:"check", items:[
+        ci("w4chk1","New weights felt controlled"),
+        ci("w4chk2","No grinding reps"),
+        ci("w4chk3","Recovery feels manageable"),
+        ci("w4chk4","Ready to continue progression"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 5
+// ────────────────────────────────────────────────
+{
+  num:5, label:"Week 5", phase:"Consolidate New Loads",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Consolidate new barbell weights from Week 4","Reinforce movement quality and recovery","Calisthenics supports shoulders, core, endurance"],
+  sessions:[
+    {id:"w5-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[liftAWarmup("w5m-"), squatSection("w5m-",230), benchSection("w5m-",170), liftAFinishers("w5m-"), liftAMobility("w5m-")]},
+    {id:"w5-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w5w-"), calisDay6Workout("w5w-"), calisAddOn("w5w-"), calisPostMob("w5w-")]},
+    {id:"w5-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[liftBWarmup("w5f-"), deadliftSection("w5f-",325), ohpSection("w5f-",90), liftBCore("w5f-"), liftBCooldown("w5f-")]},
+    {id:"w5-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w5wk-","Restorative")},
+    {id:"w5-check", day:"End of Week 5", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 5 Check", type:"check", items:[
+        ci("w5chk1","Weights felt more comfortable than Week 4"),
+        ci("w5chk2","Technique stayed clean"),
+        ci("w5chk3","Calisthenics supported recovery"),
+        ci("w5chk4","Ready for next progression decision"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 6
+// ────────────────────────────────────────────────
+{
+  num:6, label:"Week 6", phase:"Solidify Strength Gains",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Solidify strength gains at current loads","Maintain excellent technique and recovery","Exit the week feeling strong, not drained"],
+  sessions:[
+    {id:"w6-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[liftAWarmup("w6m-"), squatSection("w6m-",230), benchSection("w6m-",170), liftAFinishers("w6m-"), liftAMobility("w6m-")]},
+    {id:"w6-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w6w-"), calisDay6Workout("w6w-"), calisAddOn("w6w-"), calisPostMob("w6w-")]},
+    {id:"w6-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[liftBWarmup("w6f-"), deadliftSection("w6f-",325), ohpSection("w6f-",90), liftBCore("w6f-"), liftBCooldown("w6f-")]},
+    {id:"w6-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w6wk-","Recovery & Reset")},
+    {id:"w6-check", day:"End of Week 6", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 6 Check", type:"check", items:[
+        ci("w6chk1","All lifts felt solid and repeatable"),
+        ci("w6chk2","No grinding reps or joint irritation"),
+        ci("w6chk3","Calisthenics felt supportive, not exhausting"),
+        ci("w6chk4","Ready to decide on next progression"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 7
+// ────────────────────────────────────────────────
+{
+  num:7, label:"Week 7", phase:"Reduce Fatigue, Stay Strong",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Maintain strength at current working weights","Reduce cumulative fatigue slightly","Keep joints, hips, shoulders, and core feeling good","Set up Weeks 8–9 to finish strong"],
+  sessions:[
+    {id:"w7-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[liftAWarmup("w7m-"), squatSection("w7m-",230), benchSection("w7m-",170), liftAFinishers("w7m-"), liftAMobility("w7m-")]},
+    {id:"w7-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w7w-"), calisDay6Workout("w7w-"), calisAddOn("w7w-"), calisPostMob("w7w-")]},
+    {id:"w7-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[liftBWarmup("w7f-"), deadliftSection("w7f-",325), ohpSection("w7f-",90), liftBCore("w7f-"), liftBCooldown("w7f-")]},
+    {id:"w7-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w7wk-","Gentle, Recovery-Focused")},
+    {id:"w7-check", day:"End of Week 7", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 7 Check", type:"check", items:[
+        ci("w7chk1","Lifts felt strong but not draining"),
+        ci("w7chk2","Recovery between sessions feels good"),
+        ci("w7chk3","Joints feel stable and mobile"),
+        ci("w7chk4","Ready to finish Cycle 1 cleanly"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 8
+// ────────────────────────────────────────────────
+{
+  num:8, label:"Week 8", phase:"Prepare for Final Week",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Maintain strength without accumulating fatigue","Reinforce technique and confidence at current loads","Prepare body and nervous system for the final week"],
+  sessions:[
+    {id:"w8-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[
+        liftAWarmup("w8m-"),
+        {...squatSection("w8m-",230), note:"Rest 2–3 min. Focus: smooth descent, strong brace, even bar speed"},
+        {...benchSection("w8m-",170), note:"Rest 2–3 min. Pause briefly on chest for control if it feels good"},
+        liftAFinishers("w8m-"),
+        liftAMobility("w8m-"),
+      ]},
+    {id:"w8-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w8w-"), calisDay6Workout("w8w-"), calisAddOn("w8w-"), calisPostMob("w8w-")]},
+    {id:"w8-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[liftBWarmup("w8f-"), {...deadliftSection("w8f-",325), note:"Focus on clean setup and smooth lockout"}, ohpSection("w8f-",90), liftBCore("w8f-"), liftBCooldown("w8f-")]},
+    {id:"w8-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w8wk-","Slow and Grounding")},
+    {id:"w8-check", day:"End of Week 8", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 8 Check", type:"check", items:[
+        ci("w8chk1","All lifts felt controlled and confident"),
+        ci("w8chk2","No accumulating soreness or stiffness"),
+        ci("w8chk3","Breathing felt calm during workouts"),
+        ci("w8chk4","Ready to finish Cycle 1"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 9
+// ────────────────────────────────────────────────
+{
+  num:9, label:"Week 9", phase:"Finish Strong",
+  weights:{squat:230, bench:170, deadlift:325, press:90},
+  goals:["Maintain strength with excellent technique","Reduce psychological and physical fatigue","Finish the cycle feeling confident, mobile, and recovered"],
+  sessions:[
+    {id:"w9-mon", day:"Monday", type:"Lift A", subtitle:"Squat + Bench",
+      sections:[
+        liftAWarmup("w9m-"),
+        {...squatSection("w9m-",230), note:"Focus on calm setup, strong brace, smooth bar path"},
+        {...benchSection("w9m-",170), note:"Stop every set with 1–2 reps left in reserve"},
+        liftAFinishers("w9m-"),
+        liftAMobility("w9m-"),
+      ]},
+    {id:"w9-wed", day:"Wednesday", type:"Calisthenics", subtitle:"Day 6",
+      sections:[calisWarmup("w9w-"), calisDay6Workout("w9w-"), calisAddOn("w9w-"), calisPostMob("w9w-")]},
+    {id:"w9-fri", day:"Friday", type:"Lift B", subtitle:"Deadlift + Press",
+      sections:[liftBWarmup("w9f-"), {...deadliftSection("w9f-",325), note:"Prioritize perfect setup and smooth reps"}, ohpSection("w9f-",90), liftBCore("w9f-"), liftBCooldown("w9f-")]},
+    {id:"w9-wknd", day:"Weekend", type:"Optional", subtitle:"Yoga / Mobility",
+      sections:stdYoga("w9wk-","Cycle Closeout")},
+    {id:"w9-check", day:"End of Cycle 1", type:"Week Check", subtitle:"Final Check",
+      sections:[{title:"End of Cycle 1 — Final Check", type:"check", items:[
+        ci("w9chk1","Strength maintained or improved"),
+        ci("w9chk2","Joints feel healthy"),
+        ci("w9chk3","Mobility improved compared to Week 1"),
+        ci("w9chk4","Ready for reassessment or Cycle 2"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 10 — TRANSITION: MAX TESTING
+// ────────────────────────────────────────────────
+{
+  num:10, label:"Week 10", phase:"Strength Reassessment",
+  weights:null,
+  goals:["Find realistic, repeatable maxes","No grinders — no missed lifts","Leave 1 rep in reserve on true max attempts","Quality over ego"],
+  sessions:[
+    {
+      id:"w10-mon", day:"Monday", type:"Lower Body Max Test", subtitle:"Squat + Deadlift",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w10m-wu1","Walk or bike — 5 minutes"),
+          ci("w10m-wu2","Standing toe touches — 10"),
+          ci("w10m-wu3","Hip circles — 10 each direction"),
+          ci("w10m-wu4","Bodyweight squats — 10"),
+          ci("w10m-wu5","Glute bridges — 15"),
+        ]},
+        {title:"Back Squat — Work Up to Heavy Single", type:"lift",
+          note:"RULE: If a rep feels slow or unstable, stop. That is your max.", items:[
+          ci("w10m-sq1","Bar × 10"),
+          ci("w10m-sq2","95 × 5"),
+          ci("w10m-sq3","135 × 5"),
+          ci("w10m-sq4","185 × 3"),
+          ci("w10m-sq5","205 × 2"),
+          ci("w10m-sq6","225 × 1"),
+          ci("w10m-sq7","245 × 1 (if smooth)"),
+          ci("w10m-sq8","255–265 × 1 (stop when bar speed slows)"),
+        ]},
+        {title:"Deadlift — Work Up to Heavy Single", type:"lift",
+          note:"Stop before any grind.", items:[
+          ci("w10m-dl1","135 × 5"),
+          ci("w10m-dl2","185 × 5"),
+          ci("w10m-dl3","225 × 3"),
+          ci("w10m-dl4","275 × 2"),
+          ci("w10m-dl5","315 × 1"),
+          ci("w10m-dl6","335 × 1 (if smooth)"),
+          ci("w10m-dl7","345–365 × 1 (stop before grind)"),
+        ]},
+        {title:"Cooldown", type:"cooldown", items:[
+          ci("w10m-cd1","Couch stretch — 60s each side"),
+          ci("w10m-cd2","Hamstring stretch — 60s each side"),
+          ci("w10m-cd3","Supine breathing — 3 minutes"),
+        ]},
+      ]
+    },
+    {
+      id:"w10-wed", day:"Wednesday", type:"Upper Body Max Test", subtitle:"Bench + Press",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w10w-wu1","Walk or light cardio — 5 minutes"),
+          ci("w10w-wu2","Arm circles — 10 forward, 10 backward"),
+          ci("w10w-wu3","Band pull-aparts — 20"),
+          ci("w10w-wu4","Push-ups — 10"),
+        ]},
+        {title:"Bench Press — Work Up to Heavy Single", type:"lift",
+          note:"Stop before any grind.", items:[
+          ci("w10w-bp1","Bar × 10"),
+          ci("w10w-bp2","95 × 5"),
+          ci("w10w-bp3","115 × 5"),
+          ci("w10w-bp4","135 × 3"),
+          ci("w10w-bp5","155 × 2"),
+          ci("w10w-bp6","170 × 1"),
+          ci("w10w-bp7","180 × 1 (if smooth)"),
+          ci("w10w-bp8","185–195 × 1 (stop before grind)"),
+        ]},
+        {title:"Overhead Press — Work Up to Heavy Single", type:"lift", items:[
+          ci("w10w-ohp1","Bar × 10"),
+          ci("w10w-ohp2","65 × 5"),
+          ci("w10w-ohp3","85 × 3"),
+          ci("w10w-ohp4","95 × 1"),
+          ci("w10w-ohp5","100–105 × 1 (stop before grind)"),
+        ]},
+        {title:"Cooldown", type:"cooldown", items:[
+          ci("w10w-cd1","Cross-body shoulder stretch — 30s each side"),
+          ci("w10w-cd2","Passive hang — 30 seconds"),
+          ci("w10w-cd3","Crocodile breathing — 2 minutes"),
+        ]},
+      ]
+    },
+    {
+      id:"w10-fri", day:"Friday", type:"Optional Technique", subtitle:"Or Skip",
+      sections:[{title:"If You Train (Optional)", type:"lift", note:"If tired — skip entirely. No pressure.", items:[
+        ci("w10f-1","Empty bar squat — 3 × 5"),
+        ci("w10f-2","Empty bar bench — 3 × 5"),
+        ci("w10f-3","Empty bar deadlift — 3 × 5"),
+        ci("w10f-4","Stretch hips and shoulders"),
+      ]}]
+    },
+    {
+      id:"w10-wknd", day:"Weekend", type:"Recovery", subtitle:"Walk + Gentle Stretch",
+      sections:[{title:"Weekend", type:"mobility", items:[
+        ci("w10wk-1","Walk 30–60 minutes"),
+        ci("w10wk-2","Gentle stretching only"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 11 — DELOAD + MOBILITY RESET
+// ────────────────────────────────────────────────
+{
+  num:11, label:"Week 11", phase:"Deload + Mobility Reset",
+  weights:null,
+  goals:["Reduce accumulated fatigue from Cycle 1","Restore hips, hamstrings, shoulders, shoulder blades","Maintain movement patterns with very light load","Leave every session feeling better than you started"],
+  sessions:[
+    {
+      id:"w11-mon", day:"Monday", type:"Full Body Light Lift + Mobility", subtitle:"",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w11m-wu1","Walk or bike at very easy pace — 5 minutes"),
+          ci("w11m-wu2","Standing toe touches — 10 slow reps"),
+          ci("w11m-wu3","Hip circles — 10 clockwise, 10 counterclockwise"),
+          ci("w11m-wu4","Shoulder rolls (narrow) — 10 forward, 10 backward"),
+          ci("w11m-wu5","Shoulder rolls (wide) — 10 forward, 10 backward"),
+        ]},
+        {title:"Back Squat — Deload", type:"lift", note:"Move slowly and smoothly", items:[
+          ci("w11m-sq1","Bar × 10 reps"),
+          ci("w11m-sq2","95 × 5 reps"),
+          ci("w11m-sq3","95 × 5 reps"),
+        ]},
+        {title:"Bench Press — Deload", type:"lift", note:"Pause briefly on chest, no speed required", items:[
+          ci("w11m-bp1","Bar × 10 reps"),
+          ci("w11m-bp2","95 × 5 reps"),
+          ci("w11m-bp3","95 × 5 reps"),
+        ]},
+        {title:"Deadlift — Deload", type:"lift", note:"Focus on setup and breathing", items:[
+          ci("w11m-dl1","135 × 5 reps"),
+          ci("w11m-dl2","135 × 5 reps"),
+        ]},
+        {title:"Light Core & Decompression", type:"core", items:[
+          ci("w11m-core1","Dead hang — 30 seconds"),
+          ci("w11m-core2","Dead hang — 30 seconds"),
+          ci("w11m-core3","Front plank — 30 seconds"),
+          ci("w11m-core4","Front plank — 30 seconds"),
+        ]},
+        {title:"Mobility Reset", type:"mobility", items:[
+          ci("w11m-mob1","Kneeling hip flexor stretch — 90s/side","Back knee down, squeeze glute, ribs down"),
+          ci("w11m-mob2","Seated hamstring stretch — 90s/side","Hinge forward from hips, flat back"),
+          ci("w11m-mob3","Cross-body shoulder stretch — 45s/side"),
+          ci("w11m-mob4","Supine nasal breathing — 4 minutes","Inhale nose 4s · Exhale nose 6s"),
+        ]},
+      ]
+    },
+    {
+      id:"w11-wed", day:"Wednesday", type:"Long Mobility + Breathing", subtitle:"",
+      sections:[
+        {title:"Full Mobility Flow", type:"mobility", items:[
+          ci("w11w-m1","Forward fold — 90 seconds","Let head and arms hang freely"),
+          ci("w11w-m2","Half lift — 5 slow breaths","Hands on shins, chest open"),
+          ci("w11w-m3","Low lunge — 90s/side","Back knee down, hips gently forward"),
+          ci("w11w-m4","Standing frog stretch — 60 seconds","Feet wide, toes out, sit hips down"),
+          ci("w11w-m5","90–90 hip stretch — 10 slow rotations per side"),
+          ci("w11w-m6","Pigeon pose or seated figure-4 — 90s/side"),
+          ci("w11w-m7","Downward dog — 90 seconds","Pedal heels slowly"),
+          ci("w11w-m8","Wall shoulder opener — 90 seconds","Hands on wall, hinge hips back"),
+          ci("w11w-m9","Child's pose — 2 minutes","Slow nasal breathing"),
+        ]},
+        {title:"Breathing Reset", type:"cooldown", items:[
+          ci("w11w-br1","Lie on back — 5 minutes","One hand on belly · Inhale nose 4s · Exhale nose 6–8s"),
+        ]},
+      ]
+    },
+    {
+      id:"w11-fri", day:"Friday", type:"Light Calisthenics + Mobility", subtitle:"",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w11f-wu1","Walk — 5 minutes"),
+          ci("w11f-wu2","Hip circles — 10 each direction"),
+          ci("w11f-wu3","Arm circles — 10 forward, 10 backward"),
+        ]},
+        {title:"Light Calisthenics", type:"lift", items:[
+          ci("w11f-w1","Bodyweight squats — 10 reps"),
+          ci("w11f-w2","Bodyweight squats — 10 reps"),
+          ci("w11f-w3","Incline or knee push-ups — 10 reps"),
+          ci("w11f-w4","Incline or knee push-ups — 10 reps"),
+          ci("w11f-w5","Hanging knee raises — 8 reps"),
+          ci("w11f-w6","Hanging knee raises — 8 reps"),
+          ci("w11f-w7","Side plank — 20s/side"),
+          ci("w11f-w8","Side plank — 20s/side"),
+        ]},
+        {title:"Mobility", type:"mobility", items:[
+          ci("w11f-m1","Couch stretch — 60s/side"),
+          ci("w11f-m2","Standing hamstring stretch — 60s/side"),
+          ci("w11f-m3","Shoulder cross-body stretch — 45s/side"),
+          ci("w11f-m4","Crocodile breathing — 3 minutes","Lie face down, breathe into belly and ribs"),
+        ]},
+      ]
+    },
+    {
+      id:"w11-wknd", day:"Weekend", type:"Walking + Gentle Mobility", subtitle:"",
+      sections:[
+        {title:"Daily Target (Choose One or More)", type:"mobility", items:[
+          ci("w11wk-1","Walk 30–60 minutes"),
+          ci("w11wk-2","Easy hike"),
+          ci("w11wk-3","Light cycling"),
+          ci("w11wk-4","Long stretching session"),
+        ]},
+        {title:"Optional Evening Stretch", type:"cooldown", items:[
+          ci("w11wk-5","Forward fold"),
+          ci("w11wk-6","Hip flexor stretch"),
+          ci("w11wk-7","Hamstrings"),
+          ci("w11wk-8","Child's pose"),
+          ci("w11wk-9","Supine breathing"),
+        ]},
+      ]
+    },
+    {id:"w11-check", day:"End of Week 11", type:"Week Check", subtitle:"",
+      sections:[{title:"End of Week 11 Check", type:"check", items:[
+        ci("w11chk1","Body feels looser than start of week"),
+        ci("w11chk2","No lingering soreness"),
+        ci("w11chk3","Energy feels calm and stable"),
+        ci("w11chk4","Ready for Active Rest Week"),
+      ]}]
+    },
+  ]
+},
+
+// ────────────────────────────────────────────────
+// WEEK 12 — ACTIVE REST
+// ────────────────────────────────────────────────
+{
+  num:12, label:"Week 12", phase:"Active Rest",
+  weights:null,
+  goals:["Recover physically and mentally","Maintain daily movement and circulation","Improve aerobic base through walking and easy movement","Reinforce mobility habits without 'working out'"],
+  sessions:[
+    {
+      id:"w12-mon", day:"Monday", type:"Long Walk + Light Mobility", subtitle:"",
+      sections:[
+        {title:"Walking", type:"lift", items:[ci("w12m-w1","Walk 45–60 minutes at easy pace","Should be able to breathe through nose and hold a conversation")]},
+        {title:"Light Mobility (10–15 min)", type:"mobility", items:[
+          ci("w12m-m1","Standing toe touches — 60 seconds"),
+          ci("w12m-m2","Hip flexor stretch — 60s/side","Back knee down, squeeze glute, ribs down"),
+          ci("w12m-m3","Standing quad stretch — 45s/side"),
+          ci("w12m-m4","Cross-body shoulder stretch — 45s/side"),
+          ci("w12m-m5","Supine breathing — 3 minutes","Inhale nose 4s · Exhale nose 6–8s"),
+        ]},
+      ]
+    },
+    {
+      id:"w12-tue", day:"Tuesday", type:"Optional Easy Cardio + Stretch", subtitle:"",
+      sections:[
+        {title:"Easy Cardio (Choose One)", type:"lift", items:[
+          ci("w12t-c1","Walk 30–45 minutes"),
+          ci("w12t-c2","Easy bike ride 30 minutes"),
+          ci("w12t-c3","Easy swim 20–30 minutes"),
+        ]},
+        {title:"Stretching (10 minutes)", type:"mobility", items:[
+          ci("w12t-m1","Forward fold — 60 seconds"),
+          ci("w12t-m2","Half lift — 5 slow breaths"),
+          ci("w12t-m3","Low lunge — 60s/side"),
+          ci("w12t-m4","Child's pose — 90 seconds"),
+        ]},
+      ]
+    },
+    {
+      id:"w12-wed", day:"Wednesday", type:"Bodyweight Flow (Very Light)", subtitle:"",
+      sections:[
+        {title:"Warmup", type:"warmup", items:[
+          ci("w12w-wu1","Walk 5 minutes"),
+          ci("w12w-wu2","Arm circles — 10 forward, 10 backward"),
+          ci("w12w-wu3","Hip circles — 10 each direction"),
+        ]},
+        {title:"Bodyweight Flow (2 Rounds Only)", type:"lift", note:"Rest as needed between movements", items:[
+          ci("w12w-w1","Bodyweight squats — 15 reps"),
+          ci("w12w-w2","Push-ups (incline or knees) — 10 reps"),
+          ci("w12w-w3","Reverse lunges — 8 reps/leg"),
+          ci("w12w-w4","Front plank — 30 seconds"),
+        ]},
+        {title:"Mobility", type:"mobility", items:[
+          ci("w12w-m1","Couch stretch — 60s/side"),
+          ci("w12w-m2","Seated hamstring stretch — 60s/side"),
+          ci("w12w-m3","Wall shoulder opener — 60 seconds"),
+          ci("w12w-m4","Crocodile breathing — 3 minutes","Lie face down, breathe into belly and ribs"),
+        ]},
+      ]
+    },
+    {
+      id:"w12-thu", day:"Thursday", type:"Long Walk + Breathing", subtitle:"",
+      sections:[
+        {title:"Walking", type:"lift", items:[ci("w12th-w1","Walk 60–90 minutes","Flat or gentle hills preferred")]},
+        {title:"Breathing Reset", type:"mobility", items:[
+          ci("w12th-b1","Supine breathing — 5 minutes","Inhale nose 4s · Exhale nose 6–8s"),
+          ci("w12th-b2","Optional evening stretch: hamstrings, hips, shoulders"),
+        ]},
+      ]
+    },
+    {
+      id:"w12-fri", day:"Friday", type:"Optional Light Movement", subtitle:"",
+      sections:[
+        {title:"Choose One Option", type:"lift", items:[
+          ci("w12f-1","Walk 45 minutes"),
+          ci("w12f-2","Bike 30 minutes"),
+          ci("w12f-3","Swim 20–30 minutes"),
+        ]},
+        {title:"Short Stretch (10 min)", type:"mobility", items:[
+          ci("w12f-m1","Forward fold — 60 seconds"),
+          ci("w12f-m2","Hip flexor stretch — 60s/side"),
+          ci("w12f-m3","Shoulder stretch — 45s/side"),
+          ci("w12f-m4","Child's pose breathing — 2 minutes"),
+        ]},
+      ]
+    },
+    {
+      id:"w12-wknd", day:"Weekend", type:"Free Movement + Enjoyment", subtitle:"No Structure Required",
+      sections:[
+        {title:"Choose Activities You Enjoy", type:"mobility", items:[
+          ci("w12wk-1","Long walk"),
+          ci("w12wk-2","Hike"),
+          ci("w12wk-3","Casual bike ride"),
+          ci("w12wk-4","Yoga class"),
+          ci("w12wk-5","Mobility flow at home"),
+        ]},
+        {title:"Optional Evening Wind-Down", type:"cooldown", items:[
+          ci("w12wk-6","Forward fold"),
+          ci("w12wk-7","Figure-4 hip stretch"),
+          ci("w12wk-8","Child's pose"),
+          ci("w12wk-9","Supine breathing"),
+        ]},
+      ]
+    },
+    {id:"w12-check", day:"End of Week 12", type:"Week Check", subtitle:"Cycle Complete",
+      sections:[{title:"End of Week 12 Check", type:"check", items:[
+        ci("w12chk1","Body feels rested"),
+        ci("w12chk2","Joints feel mobile"),
+        ci("w12chk3","Energy levels feel higher"),
+        ci("w12chk4","Motivation to train is back"),
+        ci("w12chk5","Ready to start Cycle 2"),
+      ]}]
+    },
+  ]
+},
+
+]; // end WEEKS
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const STATE_KEY = "c1_state";
+const HIST_KEY  = "c1_history";
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STATE_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveState(s) {
+  localStorage.setItem(STATE_KEY, JSON.stringify(s));
+}
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; } catch(e) { return []; }
+}
+function saveHistory(h) {
+  localStorage.setItem(HIST_KEY, JSON.stringify(h));
+}
+
+let state = loadState();
+if (state.currentWeek === undefined) state.currentWeek = 0;
+if (!state.dates) state.dates = {};
+if (!state.checked) state.checked = {};
+if (!state.customWeights) state.customWeights = {};
+if (!state.setNotes) state.setNotes = {};
+if (!state.sessionNotes) state.sessionNotes = {};
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function getAllItems(session) {
+  const items = [];
+  for (const sec of session.sections) {
+    for (const it of sec.items) {
+      if (!it.sublabel) items.push(it);
+    }
+  }
+  return items;
+}
+
+function sessionProgress(sessionId, session) {
+  const items = getAllItems(session).filter(i => !i.info);
+  if (!items.length) return {done:0, total:0, pct:0};
+  const done = items.filter(i => state.checked[`${sessionId}:${i.id}`]).length;
+  return {done, total:items.length, pct: Math.round(done/items.length*100)};
+}
+
+function weekDone(weekIdx) {
+  const week = WEEKS[weekIdx];
+  return week.sessions.every(s => {
+    const p = sessionProgress(s.id, s);
+    return p.total === 0 || p.pct === 100;
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER WEEK GOALS
+// ═══════════════════════════════════════════════
+function renderGoals() {
+  const week = WEEKS[state.currentWeek];
+  const weekIdx = state.currentWeek;
+  const wts = getWeekWeights(weekIdx);
+  let html = `<div class="goals-banner">`;
+  html += `<div class="goals-title">Week ${week.num} Goals</div>`;
+  html += week.goals.map(g => `<div class="goals-text">• ${g}</div>`).join('');
+  if (wts) {
+    const isCustom = !!state.customWeights[weekIdx];
+    html += `<div style="font-size:10px;color:var(--txt3);margin-top:8px;margin-bottom:4px">Tap a weight to edit · Tap <span style="color:var(--accent)">🧮</span> to calculate plates</div>`;
+    html += `<div class="weights-grid">`;
+    for (const [key, label] of [['squat','Squat'],['bench','Bench'],['deadlift','Deadlift'],['press','Press']]) {
+      const val = wts[key];
+      const cust = state.customWeights[weekIdx] && state.customWeights[weekIdx][key] !== undefined;
+      html += `<div class="w-badge editable${cust?' custom-wt':''}" onclick="openWeightModal(${weekIdx})">
+        <div class="w-lift">${label}</div>
+        <div class="w-val">${val}</div>
+        <div class="w-unit">lb${cust?' ✏':''}
+          <button class="plate-calc-btn" onclick="event.stopPropagation();openPlateModal(${val})" title="Plate calc">🧮</button>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('week-goals').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER SESSIONS
+// ═══════════════════════════════════════════════
+function renderSessions() {
+  const week = WEEKS[state.currentWeek];
+  let html = '';
+  for (const session of week.sessions) {
+    html += renderSessionCard(session);
+  }
+  document.getElementById('sessions-container').innerHTML = html;
+}
+
+function renderSessionCard(session) {
+  const prog = sessionProgress(session.id, session);
+  const isOpen = state.openSessions && state.openSessions[session.id];
+  const dateVal = state.dates[session.id] || '';
+
+  let typeColor = '#888';
+  if (session.type.includes('Lift A')) typeColor = '#5b9bd5';
+  else if (session.type.includes('Lift B')) typeColor = '#e8a020';
+  else if (session.type.includes('Calis')) typeColor = '#a78bfa';
+  else if (session.type.includes('Optional') || session.type.includes('Yoga')) typeColor = '#34d399';
+  else if (session.type.includes('Check') || session.type.includes('Max')) typeColor = '#f87171';
+  else if (session.type.includes('Deload') || session.type.includes('Walk') || session.type.includes('Light') || session.type.includes('Free') || session.type.includes('Long') || session.type.includes('Body')) typeColor = '#34d399';
+
+  let badgeHtml = '';
+  if (session.badge) {
+    const bc = session.badgeType === 'redo' ? 'redo' : '';
+    badgeHtml = `<div class="sh-badge ${bc}">${session.badge}</div>`;
+  }
+
+  const pctHtml = prog.total > 0 ? `<span class="sh-pct">${prog.pct}%</span>` : '';
+
+  let html = `
+  <div class="session-card${isOpen ? ' open' : ''}" id="sc-${session.id}">
+    <div class="session-head" onclick="toggleSession('${session.id}')">
+      <div class="sh-left">
+        <div class="sh-day">${session.day}</div>
+        <div class="sh-title" style="color:${typeColor}">${session.type}</div>
+        ${session.subtitle ? `<div class="sh-sub">${session.subtitle}</div>` : ''}
+        ${badgeHtml}
+      </div>
+      <div class="sh-right">
+        ${pctHtml}
+        <span class="sh-chevron">⌄</span>
+      </div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill${prog.pct===100?' full':''}" style="width:${prog.pct}%"></div></div>
+    <div class="session-body">
+      <div class="date-row">
+        <span class="date-lbl">Date</span>
+        <input class="date-inp" type="date" value="${dateVal}" onchange="setDate('${session.id}', this.value)" />
+      </div>
+      ${renderSections(session)}
+      <div class="session-note-wrap">
+        <div class="session-note-label">Session Note</div>
+        <textarea class="session-note-input" placeholder="How did it go? Any PRs, issues, energy level..."
+          onchange="saveSessionNote('${session.id}',this.value)"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+        >${state.sessionNotes[session.id] || ''}</textarea>
+      </div>
+    </div>
+  </div>`;
+  return html;
+}
+
+function renderSections(session) {
+  let html = '';
+  for (let i = 0; i < session.sections.length; i++) {
+    html += renderSection(session.id, session.sections[i], i);
+  }
+  return html;
+}
+
+function renderSection(sessionId, sec, sectionIdx) {
+  const isWarmup = sec.type === 'warmup';
+  const isLift = sec.type === 'lift';
+  let html = `<div class="section">`;
+
+  // Section header with optional warmup quick-complete
+  if (isWarmup) {
+    const wuItems = sec.items.filter(i => !i.sublabel && !i.info);
+    const allDone = wuItems.length > 0 && wuItems.every(i => state.checked[`${sessionId}:${i.id}`]);
+    html += `<div class="sec-hd-row">
+      <div class="sec-title ${sec.type||''}">${sec.title}</div>
+      <button class="wu-all-btn${allDone?' done-all':''}" onclick="quickCompleteWarmup('${sessionId}',${sectionIdx})">${allDone ? '✓ Done' : '✓ All'}</button>
+    </div>`;
+  } else {
+    html += `<div class="sec-title ${sec.type||''}">${sec.title}</div>`;
+  }
+
+  if (sec.personalNote) {
+    html += `<div class="sec-note personal">📝 ${sec.personalNote}</div>`;
+  }
+  if (sec.note) {
+    html += `<div class="sec-note accent">${sec.note}</div>`;
+  }
+
+  let lastWasWorkingSet = false;
+  for (const item of sec.items) {
+    if (item.sublabel) {
+      lastWasWorkingSet = item.text.toLowerCase().includes('working');
+      html += `<div class="sub-label">${item.text}</div>`;
+      continue;
+    }
+    if (item.info) {
+      html += `<div class="sec-note">${item.text}</div>`;
+      continue;
+    }
+    const key = `${sessionId}:${item.id}`;
+    const done = !!state.checked[key];
+    const sn = state.setNotes[key] || {};
+    const badgeId = `tb-${key.replace(/:/g,'-')}`;
+    const isWorkingSet = isLift && lastWasWorkingSet;
+
+    html += `
+    <div class="ci${done?' done':''}" onclick="handleCiClick(event,'${sessionId}','${item.id}',${isWorkingSet})">
+      <div class="ci-box">${done ? '✓' : ''}</div>
+      <div class="ci-body">
+        <div class="ci-text">${item.text}
+          <span class="ci-expand-note" onclick="event.stopPropagation();expandSetNote('${sessionId}','${item.id}',this)" title="Add note">💬</span>
+        </div>
+        ${item.note ? `<div class="ci-note">${item.note}</div>` : ''}
+        <div id="${badgeId}">${sn.tag ? `<span class="ci-tag-badge ${sn.tag}">${sn.tag}</span>` : ''}</div>
+      </div>
+    </div>`;
+    // If note area already expanded, show it
+    if (sn.tag || sn.text) {
+      html += buildSetNoteArea(sessionId, item.id);
+    }
+  }
+  html += `</div>`;
+  return html;
+}
+
+function handleCiClick(event, sessionId, itemId, isWorkingSet) {
+  // Don't trigger if clicking the expand note button or a child button
+  if (event.target.tagName === 'BUTTON' || event.target.classList.contains('ci-expand-note')) return;
+  toggleItem(sessionId, itemId);
+  // After toggle: if it's now checked AND it's a working set, show rest timer
+  if (isWorkingSet && state.checked[`${sessionId}:${itemId}`]) {
+    showRestTimer();
+  }
+}
+function expandSetNote(sessionId, itemId, btnEl) {
+  const key = `${sessionId}:${itemId}`;
+  const areaId = `sna-${key.replace(/:/g,'-')}`;
+  // Toggle: if already showing, remove; else add
+  const existing = document.getElementById(areaId);
+  if (existing) {
+    existing.remove();
+  } else {
+    const noteHtml = buildSetNoteArea(sessionId, itemId);
+    btnEl.closest('.ci').insertAdjacentHTML('afterend', noteHtml);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER HEADER
+// ═══════════════════════════════════════════════
+function renderHeader() {
+  const week = WEEKS[state.currentWeek];
+  document.getElementById('week-label').textContent = week.label;
+  document.getElementById('week-sub').textContent = week.phase;
+
+  // Phase label
+  const isTransition = week.num >= 10;
+  document.getElementById('phase-label').textContent = isTransition ? 'Transition Block' : `${week.num} / 9 Weeks`;
+
+  // Nav buttons
+  document.getElementById('btn-prev').disabled = state.currentWeek === 0;
+  document.getElementById('btn-next').disabled = state.currentWeek === WEEKS.length - 1;
+
+  // Dots
+  let dotsHtml = '';
+  for (let i = 0; i < WEEKS.length; i++) {
+    const w = WEEKS[i];
+    const done = weekDone(i);
+    const active = i === state.currentWeek;
+    const trans = w.num >= 10;
+    let cls = '';
+    if (active) cls = 'active';
+    else if (done) cls = 'done';
+    else if (trans) cls = 'transition';
+    dotsHtml += `<div class="dot ${cls}" onclick="goToWeek(${i})" title="${w.label}"></div>`;
+  }
+  document.getElementById('week-dots').innerHTML = dotsHtml;
+}
+
+// ═══════════════════════════════════════════════
+//  INTERACTIONS
+// ═══════════════════════════════════════════════
+function changeWeek(dir) {
+  const next = state.currentWeek + dir;
+  if (next < 0 || next >= WEEKS.length) return;
+  state.currentWeek = next;
+  saveState(state);
+  renderAll();
+  window.scrollTo(0, 0);
+}
+
+function goToWeek(idx) {
+  state.currentWeek = idx;
+  saveState(state);
+  renderAll();
+  window.scrollTo(0, 0);
+}
+
+function toggleSession(sessionId) {
+  if (!state.openSessions) state.openSessions = {};
+  state.openSessions[sessionId] = !state.openSessions[sessionId];
+  saveState(state);
+  const card = document.getElementById(`sc-${sessionId}`);
+  if (card) {
+    card.classList.toggle('open', !!state.openSessions[sessionId]);
+  }
+}
+
+function toggleItem(sessionId, itemId) {
+  const key = `${sessionId}:${itemId}`;
+  state.checked[key] = !state.checked[key];
+  saveState(state);
+  // Find the session for history logging
+  const week = WEEKS[state.currentWeek];
+  const session = week.sessions.find(s => s.id === sessionId);
+  if (session) {
+    logHistory(sessionId, session);
+    updateSessionCard(sessionId, session);
+  }
+}
+
+function setDate(sessionId, value) {
+  state.dates[sessionId] = value;
+  saveState(state);
+  const week = WEEKS[state.currentWeek];
+  const session = week.sessions.find(s => s.id === sessionId);
+  if (session) logHistory(sessionId, session);
+}
+
+function updateSessionCard(sessionId, session) {
+  const prog = sessionProgress(sessionId, session);
+  // Update progress bar
+  const card = document.getElementById(`sc-${sessionId}`);
+  if (!card) return;
+  const fill = card.querySelector('.prog-fill');
+  if (fill) {
+    fill.style.width = prog.pct + '%';
+    fill.classList.toggle('full', prog.pct === 100);
+  }
+  // Update pct text
+  const pctEl = card.querySelector('.sh-pct');
+  if (pctEl && prog.total > 0) pctEl.textContent = prog.pct + '%';
+  // Update dot
+  renderHeader();
+  // Update individual check item
+  const items = getAllItems(session);
+  // Re-render just the open card body for efficiency - but for simplicity re-render sections
+  const body = card.querySelector('.session-body');
+  if (body && card.classList.contains('open')) {
+    const dateInp = body.querySelector('.date-inp');
+    const dateVal = dateInp ? dateInp.value : '';
+    // Preserve date and session note
+    body.innerHTML = `
+      <div class="date-row">
+        <span class="date-lbl">Date</span>
+        <input class="date-inp" type="date" value="${dateVal}" onchange="setDate('${sessionId}', this.value)" />
+      </div>
+      ${renderSections(session)}
+      <div class="session-note-wrap">
+        <div class="session-note-label">Session Note</div>
+        <textarea class="session-note-input" placeholder="How did it go? Any PRs, issues, energy level..."
+          onchange="saveSessionNote('${sessionId}',this.value)"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+        >${state.sessionNotes[sessionId] || ''}</textarea>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  HISTORY LOGGING
+// ═══════════════════════════════════════════════
+function logHistory(sessionId, session) {
+  const prog = sessionProgress(sessionId, session);
+  if (prog.done === 0) return;
+  const date = state.dates[sessionId] || '';
+  let history = loadHistory();
+  const existIdx = history.findIndex(h => h.id === sessionId);
+  const weekIdx = state.currentWeek;
+  const wts = getWeekWeights(weekIdx);
+  const entry = {
+    id: sessionId,
+    date,
+    weekNum: WEEKS[weekIdx].num,
+    day: session.day,
+    type: session.type,
+    subtitle: session.subtitle || '',
+    badge: session.badge || '',
+    done: prog.done,
+    total: prog.total,
+    pct: prog.pct,
+    weights: wts || null,
+    updatedAt: new Date().toISOString()
+  };
+  if (existIdx >= 0) history[existIdx] = entry;
+  else history.unshift(entry);
+  // Keep last 200
+  if (history.length > 200) history = history.slice(0, 200);
+  saveHistory(history);
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER HISTORY TAB
+// ═══════════════════════════════════════════════
+function renderHistory() {
+  const history = loadHistory();
+  const cont = document.getElementById('history-content');
+  if (!history.length) {
+    cont.innerHTML = `<div class="hist-empty">
+      <div class="hist-empty-icon">📋</div>
+      <div>No workouts logged yet.</div>
+      <div style="margin-top:8px;font-size:13px;color:#555">Complete exercises and add a date to log your sessions.</div>
+    </div>`;
+    return;
+  }
+  let html = renderLiftChart(history);
+  html += `<button class="hist-clear-btn" onclick="clearHistory()">Clear History</button>`;
+  for (const h of history) {
+    const dateStr = h.date ? formatDate(h.date) : 'No date set';
+    const pct = h.pct || 0;
+    html += `<div class="hist-card">
+      <div class="hist-date">Week ${h.weekNum} · ${h.day}${h.badge ? ' · ' + h.badge : ''} · ${dateStr}</div>
+      <div class="hist-title">${h.type}</div>
+      <div class="hist-sub">${h.subtitle}</div>
+      <div class="hist-bar"><div class="hist-fill" style="width:${pct}%"></div></div>
+      <div class="hist-stat">${h.done} / ${h.total} items · ${pct}% complete</div>
+    </div>`;
+  }
+  cont.innerHTML = html;
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  try {
+    const parts = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[parseInt(parts[1])-1]} ${parseInt(parts[2])}, ${parts[0]}`;
+  } catch(e) { return d; }
+}
+
+function clearHistory() {
+  if (confirm('Clear all workout history? This cannot be undone.')) {
+    saveHistory([]);
+    renderHistory();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER RECOVERY GUIDE
+// ═══════════════════════════════════════════════
+function renderRecovery() {
+  const html = `
+  <div class="rec-important">
+    <div class="rec-imp-title">The Single Most Important Rule</div>
+    <div class="rec-imp-text">
+      Never punish yourself with volume. Missing time does not require extra sets, extra days, or "earning" your place back.<br><br>
+      It requires: <strong>consistency, clean reps, patience.</strong><br><br>
+      You already built the base.
+    </div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">If You Miss 1 Week</div>
+    <div class="rec-block">
+      <div class="rec-block-title">When you return:</div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Do not make it up</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Repeat the last completed week</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Use the same weights</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Keep all reps clean</span></div>
+    </div>
+    <div class="rec-outcome">✓ One missed week = no strength loss</div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">If You Miss 2 Weeks</div>
+    <div class="rec-block">
+      <div class="rec-block-title">Most common scenario. How to restart:</div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Reduce working weights by 5–7%</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Keep the same structure</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Run one week only at the reduced load</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Resume normal progression after</span></div>
+    </div>
+    <div class="rec-block" style="margin-top:10px">
+      <div class="rec-block-title">Example reductions:</div>
+      <div class="rec-rule"><span class="rec-bullet">•</span><span class="rec-rule-text">Squat was 260 → restart at 245–250</span></div>
+      <div class="rec-rule"><span class="rec-bullet">•</span><span class="rec-rule-text">Deadlift was 355 → restart at 330–335</span></div>
+    </div>
+    <div class="rec-outcome">✓ Strength usually returns in 1–2 sessions</div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">If You Miss 3–4 Weeks</div>
+    <div class="rec-block">
+      <div class="rec-block-title">Treat it as a mini reset, not a failure:</div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Restart the current cycle at Week 1 weights</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Keep volume conservative</span></div>
+      <div class="rec-rule"><span class="rec-bullet">→</span><span class="rec-rule-text">Focus on crisp, confident reps</span></div>
+    </div>
+    <div class="rec-outcome">✓ You are reloading a system that already exists — not starting over</div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">If You Miss a Full Cycle</div>
+    <div class="rec-block">
+      <div class="rec-block-title">Do this exact sequence:</div>
+      <div class="rec-rule"><span class="rec-bullet">1</span><span class="rec-rule-text"><strong>One re-entry week:</strong><br>• 2 light lifting days<br>• 1 easy calisthenics day</span></div>
+      <div class="rec-rule"><span class="rec-bullet">2</span><span class="rec-rule-text"><strong>Then restart:</strong><br>• Cycle 2 (calisthenics), or<br>• Cycle 3 (strength) at ~90% of prior working weights</span></div>
+    </div>
+    <div class="rec-outcome">✓ Confidence returns fast when structure is familiar</div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">How to Know the Plan Is Working</div>
+    <div class="rec-block">
+      <div class="rec-rule"><span class="rec-bullet">✓</span><span class="rec-rule-text">Heavy weights feel less intimidating</span></div>
+      <div class="rec-rule"><span class="rec-bullet">✓</span><span class="rec-rule-text">Core engagement is automatic</span></div>
+      <div class="rec-rule"><span class="rec-bullet">✓</span><span class="rec-rule-text">You recover faster between sessions</span></div>
+      <div class="rec-rule"><span class="rec-bullet">✓</span><span class="rec-rule-text">Mobility feels "maintained" instead of "lost"</span></div>
+      <div class="rec-rule"><span class="rec-bullet">✓</span><span class="rec-rule-text">You look forward to lifting again</span></div>
+    </div>
+  </div>
+
+  <div class="rec-section">
+    <div class="rec-h">Progression Rules — Cycle 1</div>
+    <div class="rec-rule"><span class="rec-bullet">W1–3</span><span class="rec-rule-text">Hold weights steady</span></div>
+    <div class="rec-rule"><span class="rec-bullet">W4–6</span><span class="rec-rule-text">+5 lb to squat, bench, deadlift if reps were clean</span></div>
+    <div class="rec-rule"><span class="rec-bullet">W7–9</span><span class="rec-rule-text">Hold weights steady, focus on quality</span></div>
+  </div>
+  `;
+  document.getElementById('recovery-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════
+let currentTab = 'workout';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+
+  const views = ['workout','history','calis','recovery'];
+  for (const v of views) {
+    const el = document.getElementById(`view-${v}`);
+    if (el) {
+      el.style.display = (v === tab) ? '' : 'none';
+      el.classList.toggle('active', v === tab);
+    }
+  }
+  document.getElementById('header').style.display = tab === 'workout' ? '' : 'none';
+
+  if (tab === 'history') renderHistory();
+  if (tab === 'recovery') renderRecovery();
+  if (tab === 'calis') renderCalis();
+}
+
+// ═══════════════════════════════════════════════
+//  WEIGHT HELPERS
+// ═══════════════════════════════════════════════
+function getWeekWeights(weekIdx) {
+  const base = WEEKS[weekIdx].weights || null;
+  if (!base) return null;
+  const custom = state.customWeights[weekIdx];
+  if (custom) return Object.assign({}, base, custom);
+  return base;
+}
+
+// ═══════════════════════════════════════════════
+//  WEIGHT EDITOR MODAL
+// ═══════════════════════════════════════════════
+let _weEditIdx = -1;
+let _weApplyFuture = false;
+const LIFT_KEYS = ['squat','bench','deadlift','press'];
+const LIFT_LABELS = {squat:'Squat',bench:'Bench',deadlift:'Deadlift',press:'Press'};
+
+function openWeightModal(weekIdx) {
+  _weEditIdx = weekIdx;
+  _weApplyFuture = false;
+  const wts = getWeekWeights(weekIdx);
+  const defaults = WEEKS[weekIdx].weights;
+  document.getElementById('we-week-num').textContent = WEEKS[weekIdx].num;
+  const af = document.getElementById('af-toggle');
+  af.classList.remove('on');
+  let html = '';
+  for (const k of LIFT_KEYS) {
+    if (defaults && defaults[k] !== undefined) {
+      const val = wts ? wts[k] : defaults[k];
+      html += `<div class="weight-edit-row">
+        <div class="weight-edit-label">${LIFT_LABELS[k]}</div>
+        <div class="weight-stepper">
+          <button class="stepper-btn" onclick="stepWeight('${k}',-5)">−</button>
+          <input class="stepper-val" type="number" id="wev-${k}" value="${val}" step="5" min="0" max="999" />
+          <button class="stepper-btn" onclick="stepWeight('${k}',5)">+</button>
+        </div>
+        <span style="font-size:11px;color:var(--txt3);margin-left:8px">lb</span>
+        <span style="font-size:10px;color:var(--txt4);margin-left:4px">default ${defaults[k]}</span>
+      </div>`;
+    }
+  }
+  document.getElementById('we-fields').innerHTML = html;
+  document.getElementById('weight-modal').classList.add('open');
+}
+function stepWeight(key, delta) {
+  const inp = document.getElementById(`wev-${key}`);
+  if (!inp) return;
+  let v = parseInt(inp.value) || 0;
+  v = Math.max(0, v + delta);
+  v = Math.round(v / 5) * 5;
+  inp.value = v;
+}
+function toggleAF() {
+  _weApplyFuture = !_weApplyFuture;
+  document.getElementById('af-toggle').classList.toggle('on', _weApplyFuture);
+}
+function saveWeightEdit() {
+  if (_weEditIdx < 0) return;
+  const defaults = WEEKS[_weEditIdx].weights;
+  const newWts = {};
+  for (const k of LIFT_KEYS) {
+    const inp = document.getElementById(`wev-${k}`);
+    if (inp) newWts[k] = parseInt(inp.value) || defaults[k];
+  }
+  // Apply to this week
+  state.customWeights[_weEditIdx] = newWts;
+  // Optionally apply to future weeks
+  if (_weApplyFuture) {
+    for (let i = _weEditIdx + 1; i < WEEKS.length; i++) {
+      const fw = WEEKS[i].weights;
+      if (!fw) continue;
+      const futureDiff = {};
+      for (const k of LIFT_KEYS) {
+        if (fw[k] !== undefined) {
+          const delta = newWts[k] - (WEEKS[_weEditIdx].weights[k] || 0);
+          futureDiff[k] = Math.max(0, (fw[k] || 0) + delta);
+        }
+      }
+      state.customWeights[i] = futureDiff;
+    }
+  }
+  saveState(state);
+  closeWeightModal();
+  renderAll();
+}
+function closeWeightModal(e) {
+  if (e && e.target !== document.getElementById('weight-modal')) return;
+  document.getElementById('weight-modal').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+//  PLATE CALCULATOR
+// ═══════════════════════════════════════════════
+const PLATE_SIZES = [45,35,25,10,5,2.5];
+const PLATE_CLASSES = {45:'p45',35:'p35',25:'p25',10:'p10',5:'p5',2.5:'p2'};
+const BAR_WEIGHT = 45;
+
+function openPlateModal(targetWt) {
+  document.getElementById('plate-input').value = targetWt || 135;
+  document.getElementById('plate-modal').classList.add('open');
+  calcPlates();
+}
+function closePlateModal(e) {
+  if (e && e.target !== document.getElementById('plate-modal')) return;
+  document.getElementById('plate-modal').classList.remove('open');
+}
+function calcPlates() {
+  const total = parseFloat(document.getElementById('plate-input').value) || 0;
+  const perSide = (total - BAR_WEIGHT) / 2;
+  let remaining = perSide;
+  const plates = [];
+  if (remaining > 0) {
+    for (const p of PLATE_SIZES) {
+      while (remaining >= p - 0.01) {
+        plates.push(p);
+        remaining -= p;
+        remaining = Math.round(remaining * 100) / 100;
+      }
+    }
+  }
+  let chipsHtml = '';
+  if (plates.length === 0) {
+    chipsHtml = `<span style="color:var(--txt3);font-size:13px">Bar only (${BAR_WEIGHT} lb)</span>`;
+  } else {
+    chipsHtml = plates.map(p => `<div class="plate-chip ${PLATE_CLASSES[p]||'p2'}">${p}</div>`).join('');
+  }
+  document.getElementById('plate-chips').innerHTML = chipsHtml;
+  const actualTotal = BAR_WEIGHT + plates.reduce((a,b)=>a+b,0)*2;
+  document.getElementById('plate-total-txt').innerHTML =
+    `<span style="color:var(--txt2)">Bar ${BAR_WEIGHT} lb + ${plates.reduce((a,b)=>a+b,0)} × 2 = </span><strong style="color:var(--txt)">${actualTotal} lb</strong>`;
+}
+
+// ═══════════════════════════════════════════════
+//  REST TIMER
+// ═══════════════════════════════════════════════
+let _rtSecs = 120, _rtRemaining = 120, _rtRunning = false, _rtInterval = null;
+
+function setRestPreset(secs) {
+  _rtSecs = secs;
+  _rtRemaining = secs;
+  _rtRunning = false;
+  if (_rtInterval) { clearInterval(_rtInterval); _rtInterval = null; }
+  document.querySelectorAll('.rt-preset').forEach(b => b.classList.remove('sel'));
+  const id = `rtp-${secs}`;
+  const btn = document.getElementById(id);
+  if (btn) btn.classList.add('sel');
+  updateTimerDisplay();
+  document.getElementById('rt-playbtn').textContent = '▶';
+  document.getElementById('rt-display').classList.remove('done');
+}
+function toggleRestTimer() {
+  if (_rtRunning) {
+    clearInterval(_rtInterval);
+    _rtInterval = null;
+    _rtRunning = false;
+    document.getElementById('rt-playbtn').textContent = '▶';
+  } else {
+    if (_rtRemaining <= 0) { _rtRemaining = _rtSecs; }
+    _rtRunning = true;
+    document.getElementById('rt-playbtn').textContent = '⏸';
+    document.getElementById('rt-display').classList.remove('done');
+    _rtInterval = setInterval(() => {
+      _rtRemaining--;
+      updateTimerDisplay();
+      if (_rtRemaining <= 0) {
+        clearInterval(_rtInterval);
+        _rtInterval = null;
+        _rtRunning = false;
+        document.getElementById('rt-playbtn').textContent = '▶';
+        document.getElementById('rt-display').classList.add('done');
+        try { const v = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAA'); v.play(); } catch(e) {}
+      }
+    }, 1000);
+  }
+}
+function updateTimerDisplay() {
+  const m = Math.floor(_rtRemaining / 60);
+  const s = _rtRemaining % 60;
+  document.getElementById('rt-display').textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+function showRestTimer() {
+  document.getElementById('rest-timer').classList.add('visible');
+  setRestPreset(_rtSecs); // reset + auto-start
+  _rtRemaining = _rtSecs;
+  toggleRestTimer();
+}
+function hideRestTimer() {
+  if (_rtInterval) { clearInterval(_rtInterval); _rtInterval = null; }
+  _rtRunning = false;
+  document.getElementById('rest-timer').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════
+//  SET NOTES
+// ═══════════════════════════════════════════════
+function toggleSetNote(sessionId, itemId, tag) {
+  const key = `${sessionId}:${itemId}`;
+  if (!state.setNotes[key]) state.setNotes[key] = {};
+  if (state.setNotes[key].tag === tag) {
+    state.setNotes[key].tag = null;
+  } else {
+    state.setNotes[key].tag = tag;
+  }
+  saveState(state);
+  // refresh the note area DOM
+  const noteArea = document.getElementById(`sna-${key.replace(/:/g,'-')}`);
+  if (noteArea) noteArea.outerHTML = buildSetNoteArea(sessionId, itemId);
+  // update tag badge on the ci-body
+  updateTagBadge(sessionId, itemId);
+}
+function saveSetNoteText(sessionId, itemId, value) {
+  const key = `${sessionId}:${itemId}`;
+  if (!state.setNotes[key]) state.setNotes[key] = {};
+  state.setNotes[key].text = value;
+  saveState(state);
+}
+function buildSetNoteArea(sessionId, itemId) {
+  const key = `${sessionId}:${itemId}`;
+  const note = state.setNotes[key] || {};
+  const areaId = `sna-${key.replace(/:/g,'-')}`;
+  const tags = ['easy','good','tough','failed'];
+  const tagBtns = tags.map(t =>
+    `<button class="set-tag ${t}${note.tag===t?' sel':''}" onclick="toggleSetNote('${sessionId}','${itemId}','${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`
+  ).join('');
+  return `<div class="set-note-area" id="${areaId}">
+    <div class="tag-row">${tagBtns}</div>
+    <textarea class="set-note-txt" placeholder="Note (optional)..." rows="1"
+      onchange="saveSetNoteText('${sessionId}','${itemId}',this.value)"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+    >${note.text || ''}</textarea>
+  </div>`;
+}
+function updateTagBadge(sessionId, itemId) {
+  const key = `${sessionId}:${itemId}`;
+  const note = state.setNotes[key] || {};
+  const badge = document.getElementById(`tb-${key.replace(/:/g,'-')}`);
+  if (badge) {
+    if (note.tag) {
+      badge.innerHTML = `<span class="ci-tag-badge ${note.tag}">${note.tag}</span>`;
+    } else {
+      badge.innerHTML = '';
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SESSION NOTE
+// ═══════════════════════════════════════════════
+function saveSessionNote(sessionId, value) {
+  state.sessionNotes[sessionId] = value;
+  saveState(state);
+}
+
+// ═══════════════════════════════════════════════
+//  WARMUP QUICK-COMPLETE
+// ═══════════════════════════════════════════════
+function quickCompleteWarmup(sessionId, sectionIdx) {
+  const week = WEEKS[state.currentWeek];
+  const session = week.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  const sec = session.sections[sectionIdx];
+  if (!sec) return;
+  const items = sec.items.filter(i => !i.sublabel && !i.info);
+  const allDone = items.every(i => state.checked[`${sessionId}:${i.id}`]);
+  for (const item of items) {
+    state.checked[`${sessionId}:${item.id}`] = !allDone;
+  }
+  saveState(state);
+  logHistory(sessionId, session);
+  updateSessionCard(sessionId, session);
+}
+
+// ═══════════════════════════════════════════════
+//  TODAY BANNER
+// ═══════════════════════════════════════════════
+const DOW_MAP = {1:'Monday',3:'Wednesday',5:'Friday'}; // JS getDay: 0=Sun,1=Mon,...
+function renderTodayBanner() {
+  const slot = document.getElementById('today-banner-slot');
+  if (!slot) return;
+  const dow = new Date().getDay();
+  const dayName = DOW_MAP[dow];
+  if (!dayName) { slot.innerHTML = ''; return; }
+  // Find the first session of that day type in current week
+  const week = WEEKS[state.currentWeek];
+  const session = week.sessions.find(s => s.day === dayName);
+  if (!session) { slot.innerHTML = ''; return; }
+  const icon = dow===1 ? '💪' : dow===3 ? '🤸' : '🏋️';
+  slot.innerHTML = `<div class="today-banner" onclick="scrollToSession('${session.id}')">
+    <div class="today-icon">${icon}</div>
+    <div class="today-text">
+      <div class="today-label">Today · ${dayName}</div>
+      <div class="today-session">${session.type} — ${session.subtitle || ''}</div>
+    </div>
+    <div class="today-arrow">→</div>
+  </div>`;
+}
+function scrollToSession(sessionId) {
+  // Open the session if not open
+  if (!state.openSessions) state.openSessions = {};
+  if (!state.openSessions[sessionId]) {
+    state.openSessions[sessionId] = true;
+    saveState(state);
+    renderAll();
+  }
+  setTimeout(() => {
+    const el = document.getElementById(`sc-${sessionId}`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+}
+
+// ═══════════════════════════════════════════════
+//  CALISTHENICS EXPLORER TAB
+// ═══════════════════════════════════════════════
+function renderCalis() {
+  const cont = document.getElementById('calis-content');
+  // Gather all calisthenics sessions across all weeks
+  const entries = [];
+  for (const week of WEEKS) {
+    for (const session of week.sessions) {
+      if (session.type.toLowerCase().includes('cali') || session.subtitle && session.subtitle.toLowerCase().includes('cali') || session.type === 'Day 6' || (session.sections && session.sections.some(s => s.title && s.title.toLowerCase().includes('cali')))) {
+        entries.push({week, session});
+      }
+    }
+  }
+  if (!entries.length) {
+    cont.innerHTML = `<div class="hist-empty"><div class="hist-empty-icon">🤸</div><div>No calisthenics sessions found.</div></div>`;
+    return;
+  }
+  let html = `<div style="margin-bottom:12px;font-size:13px;color:var(--txt2)">All calisthenics days across the 12 weeks. Tap to view any session.</div>`;
+  let lastWeek = -1;
+  for (const {week, session} of entries) {
+    if (week.num !== lastWeek) {
+      html += `<div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600;margin:12px 0 6px">${week.label} — ${week.phase}</div>`;
+      lastWeek = week.num;
+    }
+    const prog = sessionProgress(session.id, session);
+    const pct = prog.total > 0 ? prog.pct : null;
+    html += `<div class="session-card${state.openSessions && state.openSessions[session.id+'-calis'] ? ' open' : ''}" id="csc-${session.id}" style="margin-bottom:8px">
+      <div class="session-head" onclick="toggleCalisSession('${session.id}','${week.num - 1}')">
+        <div class="sh-left">
+          <div class="sh-day">${session.day}</div>
+          <div class="sh-title" style="color:var(--purple)">${session.type}</div>
+          ${session.subtitle ? `<div class="sh-sub">${session.subtitle}</div>` : ''}
+        </div>
+        <div class="sh-right">
+          ${pct !== null ? `<span class="sh-pct">${pct}%</span>` : ''}
+          <span class="sh-chevron">⌄</span>
+        </div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill${prog.pct===100?' full':''}" style="width:${prog.pct}%"></div></div>
+      <div class="session-body">
+        <div class="date-row">
+          <span class="date-lbl">Date</span>
+          <input class="date-inp" type="date" value="${state.dates[session.id]||''}" onchange="setDate('${session.id}', this.value)" />
+        </div>
+        ${renderSections(session)}
+      </div>
+    </div>`;
+  }
+  cont.innerHTML = html;
+}
+function toggleCalisSession(sessionId, weekIdx) {
+  if (!state.openSessions) state.openSessions = {};
+  const key = sessionId + '-calis';
+  state.openSessions[key] = !state.openSessions[key];
+  saveState(state);
+  const card = document.getElementById(`csc-${sessionId}`);
+  if (card) card.classList.toggle('open', !!state.openSessions[key]);
+}
+
+// ═══════════════════════════════════════════════
+//  HISTORY SPARKLINES
+// ═══════════════════════════════════════════════
+function renderLiftChart(history) {
+  const liftColors = {squat:'#e8a020', bench:'#5b9bd5', deadlift:'#f87171', press:'#a78bfa'};
+  const liftLabels = {squat:'Squat', bench:'Bench', deadlift:'Deadlift', press:'Press'};
+
+  // Build data points per lift from history entries that have weight data
+  const points = {squat:[], bench:[], deadlift:[], press:[]};
+  const seen = new Set();
+  // history is newest-first, so reverse for chronological
+  const chrono = [...history].reverse();
+  for (const h of chrono) {
+    if (!h.weekNum || !h.weights) continue;
+    const wk = h.weekNum;
+    for (const k of ['squat','bench','deadlift','press']) {
+      if (h.weights[k]) {
+        points[k].push({week: wk, val: h.weights[k]});
+      }
+    }
+  }
+  // Deduplicate by week — keep last
+  for (const k of Object.keys(points)) {
+    const map = new Map();
+    for (const p of points[k]) map.set(p.week, p.val);
+    points[k] = Array.from(map.entries()).map(([week,val]) => ({week,val}));
+  }
+
+  const anyData = Object.values(points).some(arr => arr.length > 1);
+  if (!anyData) return '';
+
+  const W = 320, H = 80;
+  const allWeeks = [...new Set(Object.values(points).flat().map(p=>p.week))].sort((a,b)=>a-b);
+  if (allWeeks.length < 2) return '';
+
+  const minW = allWeeks[0], maxW = allWeeks[allWeeks.length-1];
+  const xScale = w => ((w - minW) / (maxW - minW || 1)) * (W - 20) + 10;
+
+  let svgPaths = '';
+  for (const k of ['squat','deadlift','bench','press']) {
+    const pts = points[k];
+    if (pts.length < 2) continue;
+    const vals = pts.map(p => p.val);
+    const minV = Math.min(...vals), maxV = Math.max(...vals);
+    const yScale = v => H - 8 - ((v - minV) / (maxV - minV || 1)) * (H - 16);
+    const d = pts.map((p,i) => `${i===0?'M':'L'}${xScale(p.week).toFixed(1)},${yScale(p.val).toFixed(1)}`).join(' ');
+    svgPaths += `<path d="${d}" fill="none" stroke="${liftColors[k]}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    // End dot
+    const last = pts[pts.length-1];
+    svgPaths += `<circle cx="${xScale(last.week).toFixed(1)}" cy="${yScale(last.val).toFixed(1)}" r="3" fill="${liftColors[k]}"/>`;
+  }
+
+  const legendItems = ['squat','deadlift','bench','press']
+    .filter(k => points[k].length >= 2)
+    .map(k => `<div class="chart-legend-item"><div class="chart-dot" style="background:${liftColors[k]}"></div>${liftLabels[k]}</div>`)
+    .join('');
+
+  return `<div class="hist-chart-wrap">
+    <div class="hist-chart-hd">💹 Lift Progress</div>
+    <div class="chart-legend">${legendItems}</div>
+    <div class="chart-svg-container">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="overflow:visible">${svgPaths}</svg>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  FULL RENDER
+// ═══════════════════════════════════════════════
+function renderAll() {
+  renderHeader();
+  renderGoals();
+  renderSessions();
+  renderTodayBanner();
+}
+
+// ── Init ──
+renderAll();
+
+// Re-open previously open sessions
+if (state.openSessions) {
+  for (const [id, open] of Object.entries(state.openSessions)) {
+    if (open) {
+      const card = document.getElementById(`sc-${id}`);
+      if (card) card.classList.add('open');
+    }
+  }
+}
+</script>
+</body>
+</html>
