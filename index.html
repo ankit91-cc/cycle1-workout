@@ -248,16 +248,28 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .wu-all-btn:active{opacity:.7}
 .wu-all-btn.done-all{color:var(--txt3);border-color:var(--border);background:none}
 
-/* ── Save Day ── */
+/* ── Archive Day ── */
 .save-day-btn{background:none;border:none;font-size:17px;cursor:pointer;padding:2px 3px;opacity:.3;touch-action:manipulation;line-height:1;flex-shrink:0}
-.save-day-btn.saved{opacity:1}
-.saved-day-bar{background:linear-gradient(135deg,#1a1000,#1f1500);border:1px solid var(--accent-dim);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
-.saved-day-icon{font-size:18px;flex-shrink:0}
-.saved-day-info{flex:1;min-width:0}
-.saved-day-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600}
-.saved-day-text{font-size:13px;color:var(--txt);margin-top:2px}
-.saved-day-goto{background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;flex-shrink:0}
-.saved-day-goto:active{opacity:.8}
+.save-day-btn.has-archive{opacity:1}
+.archive-badge{display:inline-block;background:#1e1200;border:1px solid var(--accent-dim);color:var(--accent);font-size:10px;padding:2px 7px;border-radius:20px;margin-top:4px;margin-right:4px;font-weight:600;letter-spacing:.05em;cursor:pointer;touch-action:manipulation}
+.archive-badge:active{opacity:.7}
+
+/* ── Archive Modal ── */
+.archive-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center}
+.archive-modal{background:var(--surf);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:20px 16px 32px;box-sizing:border-box}
+.archive-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.archive-modal-title{font-size:15px;font-weight:700;color:var(--txt)}
+.archive-modal-close{background:none;border:none;color:var(--txt3);font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
+.archive-modal-date{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:12px}
+.archive-modal-note{background:var(--surf2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--txt2);margin-bottom:14px;white-space:pre-wrap}
+.archive-modal-note-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600;margin-bottom:6px}
+.archive-checked-list{display:flex;flex-direction:column;gap:4px}
+.archive-checked-item{font-size:13px;color:var(--txt2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.archive-checked-item.done{color:var(--txt)}
+.archive-check-icon{font-size:14px;flex-shrink:0}
+.archive-set-note{font-size:11px;color:var(--txt3);margin-left:22px;margin-top:2px}
+.archive-delete-btn{display:block;width:100%;margin-top:18px;background:none;border:1px solid #5a1a1a;color:#f87171;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation}
+.archive-delete-btn:active{opacity:.7}
 
 /* ── Swap Session ── */
 .swap-btns{display:flex;gap:2px;margin-left:4px;flex-shrink:0}
@@ -1650,7 +1662,8 @@ if (!state.setNotes) state.setNotes = {};
 if (!state.sessionNotes) state.sessionNotes = {};
 if (!state.weekDoneOverride) state.weekDoneOverride = {};
 if (!state.sessionOrder) state.sessionOrder = {};
-// state.savedDay = {weekIdx, sessionId, weekLabel, sessionDay, sessionType} or null
+if (!state.archivedSessions) state.archivedSessions = {};
+// state.archivedSessions = { sessionId: [ {date, sessionNote, checked, setNotes, archivedAt}, ... ] }
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -1697,21 +1710,7 @@ function renderGoals() {
   const weekIdx = state.currentWeek;
   const wts = getWeekWeights(weekIdx);
 
-  // Saved-day bar (shown whenever a day is saved)
-  let savedDayHtml = '';
-  if (state.savedDay) {
-    const sd = state.savedDay;
-    savedDayHtml = `<div class="saved-day-bar">
-      <div class="saved-day-icon">📌</div>
-      <div class="saved-day-info">
-        <div class="saved-day-lbl">Saved Day</div>
-        <div class="saved-day-text">${sd.weekLabel} · ${sd.sessionDay} — ${sd.sessionType}</div>
-      </div>
-      <button class="saved-day-goto" onclick="goToSavedDay()">Go →</button>
-    </div>`;
-  }
-
-  let html = savedDayHtml;
+  let html = '';
   html += `<div class="goals-banner">`;
   html += `<div class="goals-title">Week ${week.num} Goals</div>`;
   html += week.goals.map(g => `<div class="goals-text">• ${g}</div>`).join('');
@@ -1771,7 +1770,7 @@ function renderSessionCard(session, weekIdx) {
   const prog = sessionProgress(session.id, session);
   const isOpen = state.openSessions && state.openSessions[session.id];
   const dateVal = state.dates[session.id] || '';
-  const isSaved = state.savedDay && state.savedDay.weekIdx === weekIdx && state.savedDay.sessionId === session.id;
+  const archives = (state.archivedSessions && state.archivedSessions[session.id]) || [];
   const isCalis = session.type.includes('Calis');
 
   let typeColor = '#888';
@@ -1787,8 +1786,12 @@ function renderSessionCard(session, weekIdx) {
     const bc = session.badgeType === 'redo' ? 'redo' : '';
     badgeHtml = `<div class="sh-badge ${bc}">${session.badge}</div>`;
   }
-  if (isSaved) {
-    badgeHtml += `<div class="sh-badge" style="background:#1a1000;border-color:var(--accent)">📌 Saved Day</div>`;
+  // Show archived date badges (yellow, tappable)
+  if (archives.length > 0) {
+    badgeHtml += archives.map((a, i) => {
+      const label = a.date ? a.date : `Archive ${i+1}`;
+      return `<span class="archive-badge" onclick="event.stopPropagation();viewArchive('${session.id}',${i})">${label}</span>`;
+    }).join('');
   }
 
   const pctHtml = prog.total > 0 ? `<span class="sh-pct">${prog.pct}%</span>` : '';
@@ -1806,8 +1809,8 @@ function renderSessionCard(session, weekIdx) {
     </div>`;
   }
 
-  // Save-day bookmark button
-  const saveBtn = `<button class="save-day-btn${isSaved?' saved':''}" onclick="event.stopPropagation();setSavedDay(${weekIdx},'${session.id}')" title="${isSaved?'Remove saved day bookmark':'Save as current day'}">📌</button>`;
+  // Archive day button
+  const saveBtn = `<button class="save-day-btn${archives.length>0?' has-archive':''}" onclick="event.stopPropagation();archiveDay(${weekIdx},'${session.id}')" title="Archive this day and reset">📌</button>`;
 
   let html = `
   <div class="session-card${isOpen ? ' open' : ''}" id="sc-${session.id}">
@@ -2683,39 +2686,120 @@ function renderLiftChart(history) {
 }
 
 // ═══════════════════════════════════════════════
-//  SAVE DAY
+//  ARCHIVE DAY
 // ═══════════════════════════════════════════════
-function setSavedDay(weekIdx, sessionId) {
+function archiveDay(weekIdx, sessionId) {
   const week = WEEKS[weekIdx];
   const session = week.sessions.find(s => s.id === sessionId);
   if (!session) return;
-  // Toggle off if already saved
-  if (state.savedDay && state.savedDay.weekIdx === weekIdx && state.savedDay.sessionId === sessionId) {
-    state.savedDay = null;
-  } else {
-    state.savedDay = {
-      weekIdx,
-      sessionId,
-      weekLabel: week.label,
-      sessionDay: session.day,
-      sessionType: session.type
-    };
-  }
+
+  // Snapshot current session data
+  const allItems = getAllItems(session);
+  const checkedSnap = {};
+  const setNotesSnap = {};
+  allItems.forEach(item => {
+    const key = `${sessionId}:${item.id}`;
+    if (state.checked[key]) checkedSnap[key] = true;
+    if (state.setNotes[key]) setNotesSnap[key] = JSON.parse(JSON.stringify(state.setNotes[key]));
+  });
+
+  const doneCount = Object.keys(checkedSnap).length;
+  const totalCount = allItems.filter(i => !i.info).length;
+
+  const archive = {
+    date: state.dates[sessionId] || new Date().toLocaleDateString('en-US', {month:'numeric',day:'numeric',year:'2-digit'}),
+    sessionNote: state.sessionNotes[sessionId] || '',
+    checked: checkedSnap,
+    setNotes: setNotesSnap,
+    doneCount,
+    totalCount,
+    archivedAt: Date.now(),
+    sessionItems: allItems.filter(i => !i.info && !i.sublabel).map(i => ({id: i.id, text: i.text}))
+  };
+
+  if (!state.archivedSessions) state.archivedSessions = {};
+  if (!state.archivedSessions[sessionId]) state.archivedSessions[sessionId] = [];
+  state.archivedSessions[sessionId].push(archive);
+
+  // Reset the session
+  allItems.forEach(item => {
+    const key = `${sessionId}:${item.id}`;
+    delete state.checked[key];
+    delete state.setNotes[key];
+  });
+  delete state.dates[sessionId];
+  delete state.sessionNotes[sessionId];
+
   saveState(state);
   renderAll();
 }
 
-function goToSavedDay() {
-  if (!state.savedDay) return;
-  state.currentWeek = state.savedDay.weekIdx;
-  if (!state.openSessions) state.openSessions = {};
-  state.openSessions[state.savedDay.sessionId] = true;
+function viewArchive(sessionId, archiveIdx) {
+  if (!state.archivedSessions || !state.archivedSessions[sessionId]) return;
+  const archive = state.archivedSessions[sessionId][archiveIdx];
+  if (!archive) return;
+
+  const pct = archive.totalCount > 0 ? Math.round(archive.doneCount / archive.totalCount * 100) : 0;
+
+  let itemsHtml = '';
+  if (archive.sessionItems && archive.sessionItems.length > 0) {
+    itemsHtml = `<div class="archive-modal-note-lbl" style="margin-bottom:8px">Exercises</div>
+    <div class="archive-checked-list">` +
+    archive.sessionItems.map(item => {
+      const key = `${sessionId}:${item.id}`;
+      const done = !!archive.checked[key];
+      const sn = archive.setNotes[key];
+      let snHtml = '';
+      if (sn && sn.tag) snHtml = `<div class="archive-set-note">${sn.tag}</div>`;
+      return `<div class="archive-checked-item${done?' done':''}">
+        <span class="archive-check-icon">${done ? '✅' : '⬜'}</span>
+        <span>${item.text}</span>
+      </div>${snHtml}`;
+    }).join('') + `</div>`;
+  }
+
+  const noteHtml = archive.sessionNote
+    ? `<div class="archive-modal-note-lbl">Session Note</div>
+       <div class="archive-modal-note">${archive.sessionNote}</div>`
+    : '';
+
+  const modalHtml = `<div class="archive-modal-overlay" onclick="closeArchiveModal(event)">
+    <div class="archive-modal" onclick="event.stopPropagation()">
+      <div class="archive-modal-hd">
+        <div class="archive-modal-title">📌 Archived Day</div>
+        <button class="archive-modal-close" onclick="closeArchiveModal()">×</button>
+      </div>
+      <div class="archive-modal-date">${archive.date} &nbsp;·&nbsp; ${pct}% complete</div>
+      ${noteHtml}
+      ${itemsHtml}
+      <button class="archive-delete-btn" onclick="deleteArchive('${sessionId}',${archiveIdx})">Delete this archive</button>
+    </div>
+  </div>`;
+
+  const el = document.createElement('div');
+  el.id = 'archive-modal-root';
+  el.innerHTML = modalHtml;
+  document.body.appendChild(el);
+}
+
+function closeArchiveModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  const el = document.getElementById('archive-modal-root');
+  if (el) el.remove();
+}
+
+function deleteArchive(sessionId, archiveIdx) {
+  if (!state.archivedSessions || !state.archivedSessions[sessionId]) return;
+  state.archivedSessions[sessionId].splice(archiveIdx, 1);
+  if (state.archivedSessions[sessionId].length === 0) delete state.archivedSessions[sessionId];
   saveState(state);
+  closeArchiveModal();
   renderAll();
-  window.scrollTo(0, 0);
-  setTimeout(() => {
-    const el = document.getElementById(`sc-${state.savedDay.sessionId}`);
-    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function _legacyGoToSavedDay() {
+  // kept as stub for any old saved state references
+  return;
   }, 120);
 }
 
