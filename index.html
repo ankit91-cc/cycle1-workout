@@ -248,6 +248,29 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .wu-all-btn:active{opacity:.7}
 .wu-all-btn.done-all{color:var(--txt3);border-color:var(--border);background:none}
 
+/* ── Save Day ── */
+.save-day-btn{background:none;border:none;font-size:17px;cursor:pointer;padding:2px 3px;opacity:.3;touch-action:manipulation;line-height:1;flex-shrink:0}
+.save-day-btn.saved{opacity:1}
+.saved-day-bar{background:linear-gradient(135deg,#1a1000,#1f1500);border:1px solid var(--accent-dim);border-radius:var(--radius);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.saved-day-icon{font-size:18px;flex-shrink:0}
+.saved-day-info{flex:1;min-width:0}
+.saved-day-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600}
+.saved-day-text{font-size:13px;color:var(--txt);margin-top:2px}
+.saved-day-goto{background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation;flex-shrink:0}
+.saved-day-goto:active{opacity:.8}
+
+/* ── Swap Session ── */
+.swap-btns{display:flex;gap:2px;margin-left:4px;flex-shrink:0}
+.swap-btn{background:var(--surf2);border:1px solid var(--border2);color:var(--txt3);border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;touch-action:manipulation;flex-shrink:0}
+.swap-btn:active{opacity:.7}
+.swap-btn[disabled]{opacity:.2;pointer-events:none}
+
+/* ── Mark Week Done ── */
+.mark-done-btn{background:var(--surf2);border:1px solid var(--border2);color:var(--txt3);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation;width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.mark-done-btn.activatable{border-color:var(--green);color:var(--green)}
+.mark-done-btn.done-override{background:#0a1f0a;border-color:var(--green);color:var(--green)}
+.mark-done-btn:active{opacity:.7}
+
 /* ── Weight Edit Modal ── */
 .weight-edit-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:70vh;overflow-y:auto}
 .weight-edit-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
@@ -1625,6 +1648,9 @@ if (!state.checked) state.checked = {};
 if (!state.customWeights) state.customWeights = {};
 if (!state.setNotes) state.setNotes = {};
 if (!state.sessionNotes) state.sessionNotes = {};
+if (!state.weekDoneOverride) state.weekDoneOverride = {};
+if (!state.sessionOrder) state.sessionOrder = {};
+// state.savedDay = {weekIdx, sessionId, weekLabel, sessionDay, sessionType} or null
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -1647,6 +1673,15 @@ function sessionProgress(sessionId, session) {
 }
 
 function weekDone(weekIdx) {
+  if (state.weekDoneOverride && state.weekDoneOverride[weekIdx]) return true;
+  const week = WEEKS[weekIdx];
+  return week.sessions.every(s => {
+    const p = sessionProgress(s.id, s);
+    return p.total === 0 || p.pct === 100;
+  });
+}
+
+function weekNaturallyDone(weekIdx) {
   const week = WEEKS[weekIdx];
   return week.sessions.every(s => {
     const p = sessionProgress(s.id, s);
@@ -1661,7 +1696,23 @@ function renderGoals() {
   const week = WEEKS[state.currentWeek];
   const weekIdx = state.currentWeek;
   const wts = getWeekWeights(weekIdx);
-  let html = `<div class="goals-banner">`;
+
+  // Saved-day bar (shown whenever a day is saved)
+  let savedDayHtml = '';
+  if (state.savedDay) {
+    const sd = state.savedDay;
+    savedDayHtml = `<div class="saved-day-bar">
+      <div class="saved-day-icon">📌</div>
+      <div class="saved-day-info">
+        <div class="saved-day-lbl">Saved Day</div>
+        <div class="saved-day-text">${sd.weekLabel} · ${sd.sessionDay} — ${sd.sessionType}</div>
+      </div>
+      <button class="saved-day-goto" onclick="goToSavedDay()">Go →</button>
+    </div>`;
+  }
+
+  let html = savedDayHtml;
+  html += `<div class="goals-banner">`;
   html += `<div class="goals-title">Week ${week.num} Goals</div>`;
   html += week.goals.map(g => `<div class="goals-text">• ${g}</div>`).join('');
   if (wts) {
@@ -1681,6 +1732,16 @@ function renderGoals() {
     }
     html += `</div>`;
   }
+  // Mark Week Done button
+  const natDone = weekNaturallyDone(weekIdx);
+  const overrideDone = !!(state.weekDoneOverride && state.weekDoneOverride[weekIdx]);
+  if (!natDone) {
+    if (overrideDone) {
+      html += `<button class="mark-done-btn done-override" onclick="toggleWeekDone(${weekIdx})">✓ Week Marked Done — tap to undo</button>`;
+    } else {
+      html += `<button class="mark-done-btn activatable" onclick="toggleWeekDone(${weekIdx})">☑ Mark Week Done</button>`;
+    }
+  }
   html += `</div>`;
   document.getElementById('week-goals').innerHTML = html;
 }
@@ -1688,19 +1749,30 @@ function renderGoals() {
 // ═══════════════════════════════════════════════
 //  RENDER SESSIONS
 // ═══════════════════════════════════════════════
+function getOrderedSessions(weekIdx) {
+  const week = WEEKS[weekIdx];
+  const order = state.sessionOrder && state.sessionOrder[weekIdx];
+  if (!order) return [...week.sessions];
+  return order.map(id => week.sessions.find(s => s.id === id)).filter(Boolean);
+}
+
 function renderSessions() {
-  const week = WEEKS[state.currentWeek];
+  const weekIdx = state.currentWeek;
+  const sessions = getOrderedSessions(weekIdx);
   let html = '';
-  for (const session of week.sessions) {
-    html += renderSessionCard(session);
+  for (const session of sessions) {
+    html += renderSessionCard(session, weekIdx);
   }
   document.getElementById('sessions-container').innerHTML = html;
 }
 
-function renderSessionCard(session) {
+function renderSessionCard(session, weekIdx) {
+  if (weekIdx === undefined) weekIdx = state.currentWeek;
   const prog = sessionProgress(session.id, session);
   const isOpen = state.openSessions && state.openSessions[session.id];
   const dateVal = state.dates[session.id] || '';
+  const isSaved = state.savedDay && state.savedDay.weekIdx === weekIdx && state.savedDay.sessionId === session.id;
+  const isCalis = session.type.includes('Calis');
 
   let typeColor = '#888';
   if (session.type.includes('Lift A')) typeColor = '#5b9bd5';
@@ -1715,8 +1787,27 @@ function renderSessionCard(session) {
     const bc = session.badgeType === 'redo' ? 'redo' : '';
     badgeHtml = `<div class="sh-badge ${bc}">${session.badge}</div>`;
   }
+  if (isSaved) {
+    badgeHtml += `<div class="sh-badge" style="background:#1a1000;border-color:var(--accent)">📌 Saved Day</div>`;
+  }
 
   const pctHtml = prog.total > 0 ? `<span class="sh-pct">${prog.pct}%</span>` : '';
+
+  // Swap buttons for calisthenics sessions
+  let swapHtml = '';
+  if (isCalis) {
+    const sessions = getOrderedSessions(weekIdx);
+    const idx = sessions.findIndex(s => s.id === session.id);
+    const canUp = idx > 0;
+    const canDown = idx < sessions.length - 1;
+    swapHtml = `<div class="swap-btns" title="Move calisthenics day">
+      <button class="swap-btn" onclick="event.stopPropagation();swapSession(${weekIdx},'${session.id}',-1)" ${canUp?'':'disabled'} title="Move earlier in week">↑</button>
+      <button class="swap-btn" onclick="event.stopPropagation();swapSession(${weekIdx},'${session.id}',1)" ${canDown?'':'disabled'} title="Move later in week">↓</button>
+    </div>`;
+  }
+
+  // Save-day bookmark button
+  const saveBtn = `<button class="save-day-btn${isSaved?' saved':''}" onclick="event.stopPropagation();setSavedDay(${weekIdx},'${session.id}')" title="${isSaved?'Remove saved day bookmark':'Save as current day'}">📌</button>`;
 
   let html = `
   <div class="session-card${isOpen ? ' open' : ''}" id="sc-${session.id}">
@@ -1729,6 +1820,8 @@ function renderSessionCard(session) {
       </div>
       <div class="sh-right">
         ${pctHtml}
+        ${swapHtml}
+        ${saveBtn}
         <span class="sh-chevron">⌄</span>
       </div>
     </div>
@@ -2587,6 +2680,73 @@ function renderLiftChart(history) {
       <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="overflow:visible">${svgPaths}</svg>
     </div>
   </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  SAVE DAY
+// ═══════════════════════════════════════════════
+function setSavedDay(weekIdx, sessionId) {
+  const week = WEEKS[weekIdx];
+  const session = week.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  // Toggle off if already saved
+  if (state.savedDay && state.savedDay.weekIdx === weekIdx && state.savedDay.sessionId === sessionId) {
+    state.savedDay = null;
+  } else {
+    state.savedDay = {
+      weekIdx,
+      sessionId,
+      weekLabel: week.label,
+      sessionDay: session.day,
+      sessionType: session.type
+    };
+  }
+  saveState(state);
+  renderAll();
+}
+
+function goToSavedDay() {
+  if (!state.savedDay) return;
+  state.currentWeek = state.savedDay.weekIdx;
+  if (!state.openSessions) state.openSessions = {};
+  state.openSessions[state.savedDay.sessionId] = true;
+  saveState(state);
+  renderAll();
+  window.scrollTo(0, 0);
+  setTimeout(() => {
+    const el = document.getElementById(`sc-${state.savedDay.sessionId}`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 120);
+}
+
+// ═══════════════════════════════════════════════
+//  SWAP CALISTHENICS DAY
+// ═══════════════════════════════════════════════
+function swapSession(weekIdx, sessionId, dir) {
+  const sessions = getOrderedSessions(weekIdx);
+  const ids = sessions.map(s => s.id);
+  const idx = ids.indexOf(sessionId);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= ids.length) return;
+  // Swap positions
+  const tmp = ids[idx];
+  ids[idx] = ids[newIdx];
+  ids[newIdx] = tmp;
+  if (!state.sessionOrder) state.sessionOrder = {};
+  state.sessionOrder[weekIdx] = ids;
+  saveState(state);
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════
+//  MARK WEEK DONE
+// ═══════════════════════════════════════════════
+function toggleWeekDone(weekIdx) {
+  if (!state.weekDoneOverride) state.weekDoneOverride = {};
+  state.weekDoneOverride[weekIdx] = !state.weekDoneOverride[weekIdx];
+  saveState(state);
+  renderHeader();
+  renderGoals();
 }
 
 // ═══════════════════════════════════════════════
