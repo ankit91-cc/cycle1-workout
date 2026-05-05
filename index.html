@@ -241,47 +241,59 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .chart-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .chart-empty{font-size:13px;color:var(--txt3);text-align:center;padding:12px 0}
 
+/* ── Calisthenics Tab ── */
+.calis-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.calis-title{font-size:18px;font-weight:800}
+.calis-subtitle{font-size:12px;color:var(--txt2);margin-top:2px}
+.calis-day-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;margin:0 -12px;padding:0 12px 4px}
+.calis-day-scroll::-webkit-scrollbar{display:none}
+.calis-day-row{display:flex;gap:6px;width:max-content;padding-bottom:4px}
+.calis-chip{flex-shrink:0;padding:7px 13px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surf2);color:var(--txt2);touch-action:manipulation;transition:all .15s}
+.calis-chip.active{background:var(--purple);border-color:var(--purple);color:#fff}
+.calis-chip.rest{color:var(--teal)}
+.calis-chip.rest.active{background:var(--teal);border-color:var(--teal);color:#000}
+.calis-assign-bar{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin:10px 0 14px}
+.calis-assign-info{font-size:12px;color:var(--txt2)}
+.calis-assign-week{font-size:13px;font-weight:700;color:var(--txt);margin-top:1px}
+.calis-assign-btn{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}
+.calis-assign-btn:active{opacity:.8}
+.calis-rest-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;margin-top:8px}
+.calis-rest-icon{font-size:40px;margin-bottom:10px}
+.calis-rest-title{font-size:18px;font-weight:700;color:var(--teal)}
+.calis-rest-sub{font-size:13px;color:var(--txt2);margin-top:6px}
+.calis-wu-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.calis-wu-head{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;touch-action:manipulation}
+.calis-wu-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2)}
+.calis-wu-toggle{font-size:18px;color:var(--txt4);transition:transform .2s}
+.calis-wu-card.open .calis-wu-toggle{transform:rotate(180deg)}
+.calis-wu-body{display:none;padding:0 14px 12px}
+.calis-wu-card.open .calis-wu-body{display:block}
+.calis-wu-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--txt2)}
+.calis-wu-item:last-child{border-bottom:none}
+.calis-wu-dot{width:6px;height:6px;border-radius:50%;background:var(--txt3);flex-shrink:0}
+.calis-ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.calis-ex-head{padding:12px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue)}
+.calis-ex-item{display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-top:1px solid var(--border);font-size:14px;color:var(--txt);cursor:pointer;touch-action:manipulation}
+.calis-ex-item.done{color:var(--txt3)}
+.calis-ex-cb{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.calis-ex-item.done .calis-ex-cb{background:var(--green);border-color:var(--green)}
+.calis-ex-cb-check{color:#000;font-size:13px;font-weight:700;display:none}
+.calis-ex-item.done .calis-ex-cb-check{display:block}
+.calis-ex-text{flex:1;line-height:1.4}
+.calis-ex-item.done .calis-ex-text{text-decoration:line-through}
+.calis-progress-row{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+.calis-prog-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.calis-prog-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .3s}
+.calis-prog-fill.done{background:var(--green)}
+.calis-prog-label{font-size:11px;color:var(--txt3);white-space:nowrap}
+.calis-clear-btn{font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:2px 6px;touch-action:manipulation;text-decoration:underline}
+
 /* ── Warmup Quick Complete ── */
 .sec-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-top:2px}
 .sec-hd-row .sec-title{margin-bottom:0;padding-top:0}
 .wu-all-btn{font-size:11px;background:var(--surf2);border:1px solid var(--border2);color:var(--green);border-radius:6px;padding:3px 8px;cursor:pointer;touch-action:manipulation;font-weight:600}
 .wu-all-btn:active{opacity:.7}
 .wu-all-btn.done-all{color:var(--txt3);border-color:var(--border);background:none}
-
-/* ── Archive Day ── */
-.save-day-btn{background:none;border:none;font-size:17px;cursor:pointer;padding:2px 3px;opacity:.3;touch-action:manipulation;line-height:1;flex-shrink:0}
-.save-day-btn.has-archive{opacity:1}
-.archive-badge{display:inline-block;background:#1e1200;border:1px solid var(--accent-dim);color:var(--accent);font-size:10px;padding:2px 7px;border-radius:20px;margin-top:4px;margin-right:4px;font-weight:600;letter-spacing:.05em;cursor:pointer;touch-action:manipulation}
-.archive-badge:active{opacity:.7}
-
-/* ── Archive Modal ── */
-.archive-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center}
-.archive-modal{background:var(--surf);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:20px 16px 32px;box-sizing:border-box}
-.archive-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.archive-modal-title{font-size:15px;font-weight:700;color:var(--txt)}
-.archive-modal-close{background:none;border:none;color:var(--txt3);font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
-.archive-modal-date{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:12px}
-.archive-modal-note{background:var(--surf2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--txt2);margin-bottom:14px;white-space:pre-wrap}
-.archive-modal-note-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600;margin-bottom:6px}
-.archive-checked-list{display:flex;flex-direction:column;gap:4px}
-.archive-checked-item{font-size:13px;color:var(--txt2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.archive-checked-item.done{color:var(--txt)}
-.archive-check-icon{font-size:14px;flex-shrink:0}
-.archive-set-note{font-size:11px;color:var(--txt3);margin-left:22px;margin-top:2px}
-.archive-delete-btn{display:block;width:100%;margin-top:18px;background:none;border:1px solid #5a1a1a;color:#f87171;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation}
-.archive-delete-btn:active{opacity:.7}
-
-/* ── Swap Session ── */
-.swap-btns{display:flex;gap:2px;margin-left:4px;flex-shrink:0}
-.swap-btn{background:var(--surf2);border:1px solid var(--border2);color:var(--txt3);border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;touch-action:manipulation;flex-shrink:0}
-.swap-btn:active{opacity:.7}
-.swap-btn[disabled]{opacity:.2;pointer-events:none}
-
-/* ── Mark Week Done ── */
-.mark-done-btn{background:var(--surf2);border:1px solid var(--border2);color:var(--txt3);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation;width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
-.mark-done-btn.activatable{border-color:var(--green);color:var(--green)}
-.mark-done-btn.done-override{background:#0a1f0a;border-color:var(--green);color:var(--green)}
-.mark-done-btn:active{opacity:.7}
 
 /* ── Weight Edit Modal ── */
 .weight-edit-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:70vh;overflow-y:auto}
@@ -422,46 +434,176 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 const ci = (id, text, note) => ({id, text, ...(note ? {note} : {})});
 const infoItem = (id, text) => ({id, text, info: true});
 
-// Standard calisthenics Day 6 warmup (weeks 3-9)
+// ═══════════════════════════════════════════════
+//  CALISTHENICS LEVEL 1 DATA
+// ═══════════════════════════════════════════════
+const CALIS_WARMUP = [
+  "Hip standing split stretch",
+  "Standing frog stretch",
+  "Narrow shoulder rolls",
+  "Wide shoulder rolls",
+  "Wrists, forearms & shoulders",
+  "Floor hollow hold",
+  "Band pull apart",
+  "Jump rope",
+  "Standing toe touch",
+];
+
+const CALIS_DAYS = [
+  {num:1, label:"Day 1", isRest:false, items:[
+    "Australian rows — superset 1 ladder from 10–1",
+    "Classic pushups — superset 1 ladder from 10–1",
+    "Front & face band pull — superset 2 ladder from 10–1",
+    "Box dips — superset 2 ladder from 10–1",
+    "Elevated hip raises — 30s × 2 sets",
+    "Lunges — 15s each leg",
+    "Squats — 30s × 2 sets",
+    "Mountain climber variations — 30s × 2 sets",
+    "Plank variations — superset 3 — 30s × 2 sets",
+    "Superman holds — superset 3 — 30s × 2 sets",
+    "High bar knee raises — 6–8 reps × 3 sets",
+    "Dead hang — 20s × 3 sets",
+    "Floor hollow flutter kicks — 20s × 3 sets",
+  ]},
+  {num:2, label:"Day 2", isRest:false, items:[
+    "Jump rope — alternate 20s slow / 10s fast × 8 sets (mix both-feet and single-foot jumps)",
+    "Squats — 20s reps / 10s hold × 4 sets",
+    "Elevated hip raises — 20s reps / 10s hold × 4 sets",
+    "Floor hollow hold — 30s × 2 sets",
+    "Dorsiflexion hold — 30s × 2 sets",
+    "Superman floor hold — 30s × 2 sets",
+    "Flutter kicks — 30s × 2 sets",
+  ]},
+  {num:3, label:"Day 3", isRest:false, items:[
+    "Australian rows — superset 1 ladder from 10–1",
+    "Box dips — superset 1 ladder from 10–1",
+    "Dead hang — superset 2 descending ladder 10s to 1",
+    "Hanging shoulder shrugs — superset 2 descending ladder 10s to 1",
+    "Squat jumps — superset 3 descending ladder 10–1",
+    "Elevated hip & glute raise — superset 3 descending ladder 10–1",
+    "Side squats — 8 reps × 3 sets",
+    "P-bar knee raises — 8 reps × 3 sets",
+    "Superman floor hold — 30s × 2 sets",
+    "Mountain climber variations — 30s × 2 sets",
+    "Flutter kicks — 30s × 2 sets",
+  ]},
+  {num:4, label:"Day 4", isRest:false, items:[
+    "Jump rope — alternate 20s slow / 10s fast × 8 sets (mix both-feet and single-foot jumps)",
+    "Classic pushups — superset 1 — 20s AMRAP × 4 sets",
+    "Plank — superset 1 — 10s × 4 sets",
+    "Front & face band pulls — alternate 20s reps (AMRAP) / 10s hold × 4 sets (front pull → face pull → alternate)",
+    "Hanging knee raises — 30s × 2 sets",
+    "Laying floor leg hold — 30s × 2 sets",
+    "Superman floor hold — 30s × 2 sets",
+    "Floor hollow hold — 30s × 2 sets",
+  ]},
+  {num:5, label:"Day 5", isRest:false, items:[
+    "Australian rows — 30s AMRAP × 6 sets (rest 10s between sets)",
+    "Classic pushups — 30s AMRAP × 6 sets (rest 10s between sets)",
+    "High bar knee raises — 30s AMRAP × 6 sets (rest 10s between sets)",
+    "Squats — 30s AMRAP × 6 sets (rest 10s between sets)",
+  ]},
+  {num:6, label:"Day 6", isRest:false, items:[
+    "Pull-ups or band pull-up — descending ladder 10s to 1",
+    "Floor assisted lat flies — 5 reps × 3 sets",
+    "High bar shrugs — 5 reps × 3 sets",
+    "Front & face band pulls — 10 reps × 3 sets",
+    "Plank variation — superset 1 — 30s × 3 sets",
+    "Shoulder taps — superset 1 — 30s × 3 sets (alternate)",
+    "Tricep band pulls — 20s × 3 sets",
+    "Squats — 1 min × 3 sets",
+    "Elevated hip raises — 20s × 3 sets",
+    "High bar knee raises — 10 reps",
+    "P-bar knee raises — 10 reps",
+    "Straight & lateral flutter kicks — 10 reps straight, 10 reps lateral",
+    "Floor hollow hold — 30s × 2 sets",
+  ]},
+  {num:7, label:"Day 7 — Rest", isRest:true, items:[]},
+  {num:8, label:"Day 8", isRest:false, items:[
+    "Classic floor pushups — ascending ladder 1–10",
+    "Jump P-bar dips — 8–12 reps × 3 sets",
+    "Hollow plank variation — superset 1 — 20s × 3 sets",
+    "Shoulder taps — superset 1 — 8 reps × 3 sets",
+    "Floor assisted lat flies — 5 reps × 3 sets",
+    "Front & face band pulls — 30s each × 3 sets",
+    "Dead hang — 20s × 3 sets",
+    "Lunges — 30s each leg × 3 sets",
+    "Box squats — 30s × 3 sets",
+    "High bar knee raises — 10 reps",
+    "P-bar knee raises — 10 reps",
+    "Straight & lateral flutter kicks — 20 reps each",
+    "Floor hollow hold — 20s × 3 sets",
+  ]},
+  {num:9, label:"Day 9", isRest:false, items:[
+    "Jump rope — alternate 20s slow / 10s fast × 8 sets",
+    "Front & face band pulls — alternate 20s reps (AMRAP) / 10s hold × 2 sets (front then face pull each set)",
+    "Classic pushups — superset 1 ladder from 10–1",
+    "Squats — superset 1 ladder from 10–1",
+    "Elevated hip raises — alternate 20s reps (AMRAP) / 10s hold × 2 sets",
+    "Floor laying leg hold — 30s × 2 sets",
+    "Superman floor hold — 30s × 2 sets",
+    "Floor hollow hold — 30s × 2 sets",
+    "Floor leg flutter kicks — 30s × 2 sets",
+  ]},
+  {num:10, label:"Day 10", isRest:false, items:[
+    "Squats — alternate 20s reps / 10s rest × 8 sets",
+    "Elevated lunges — descending ladder 10–1",
+    "Squat jumps — alternate 10s jumps / 10s squat hold × 3 sets",
+    "Elevated hip raises — 10 reps × 4 sets",
+    "Australian rows — superset 1 — 5 reps × 8 sets",
+    "Pushups — superset 1 — 5 reps × 8 sets",
+    "Plank variations — superset 2 — 20s × 3 sets",
+    "Superman holds — superset 2 — 20s × 3 sets",
+    "Dead hang — 20s × 3 sets",
+    "Hollow hold with flutter kicks — 20s × 3 sets",
+  ]},
+  {num:11, label:"Day 11", isRest:false, items:[
+    "Jump rope — alternate 20s slow / 10s fast × 8 sets",
+    "Squats — 1 min × 2 sets",
+    "Band pull apart — alternate 20s isometric hold / 10s reps × 2 sets",
+    "Triceps band pull — alternate 20s isometric hold / 10s reps × 2 sets",
+    "Plank — 1 min × 2 sets",
+    "Superman floor hold — 1 min",
+    "Floor hollow hold — 1 min",
+  ]},
+  {num:12, label:"Day 12", isRest:false, items:[
+    "Classic pushups — ladder from 10–1",
+    "Box dips — ascending ladder 1–10 (ALTERNATE with standing skull crushers — ascending ladder 1–10)",
+    "Lunges — 10 reps per leg × 5 sets",
+    "Elevated hip raises — 10 reps × 5 sets",
+    "Superman floor hold — 1 min",
+    "High bar knee raises — 8 reps × 3 sets",
+    "Dead hang — 20s × 3 sets",
+    "Hollow hold with flutter kicks — 20s × 3 sets",
+  ]},
+  {num:13, label:"Day 13", isRest:false, items:[
+    "Jump rope — alternate 20s slow / 10s fast × 8 sets",
+    "Crawling — 1 min (keep hips low, chest low; bring right knee to right elbow, extend opposite arm)",
+    "Bear walk — 1 min (tuck core & ribs, push through heels, keep hands & feet flat)",
+    "Mini walk — 1 min (straight back, core tucked, hands up, keep hips & knee height)",
+    "Frog jump — 1 min (hands up, straight back, jump forward, hands behind on landing)",
+    "Floor laying leg hold — 1 min",
+    "Superman floor hold — 1 min",
+    "Floor hollow hold — 1 min",
+    "Leg flutter kicks — 1 min",
+  ]},
+];
+
+// Standard calisthenics warmup (weeks 3-9) — now uses CALIS_WARMUP data
 function calisWarmup(p) {
-  return {title:"Full Calisthenics Warmup", type:"warmup", items:[
-    ci(`${p}wu1`,"Hip standing split stretch — 30s/side","Step one leg back, torso tall, feel stretch in front hip"),
-    ci(`${p}wu2`,"Standing frog stretch — 30 seconds","Feet wide, toes slightly out, gently sit hips down"),
-    ci(`${p}wu3`,"Narrow shoulder rolls — 10 forward, 10 backward"),
-    ci(`${p}wu4`,"Wide shoulder rolls — 10 forward, 10 backward"),
-    ci(`${p}wu5`,"Wrist circles — 10 each direction"),
-    ci(`${p}wu6`,"Band pull-aparts — 20 reps"),
-    ci(`${p}wu7`,"Jump rope — 2 minutes at easy pace"),
-    ci(`${p}wu8`,"Standing toe touches — 10 slow reps"),
-  ]};
+  return {title:"Warmup", type:"warmup", items:
+    CALIS_WARMUP.map((text, i) => ci(`${p}wu${i+1}`, text))
+  };
 }
 
 // Standard calisthenics Day 6 workout (weeks 3-9)
 function calisDay6Workout(p) {
-  return {title:"Calisthenics Workout (Day 6)", type:"lift", items:[
-    ci(`${p}w1`,"Pull-ups or band pull-up — descending ladder 10s to 1"),
-    ci(`${p}w2`,"Floor assisted lat flies — 5 reps × 3 sets"),
-    ci(`${p}w3`,"High bar shrugs — 5 reps × 3 sets"),
-    ci(`${p}w4`,"Front & face band pulls — 10 reps × 3 sets"),
-    ci(`${p}w5`,"Plank variation — superset 1 — 30s × 3 sets"),
-    ci(`${p}w6`,"Shoulder taps — superset 1 — 30s × 3 sets (alternate)"),
-    ci(`${p}w7`,"Tricep band pulls — 20s × 3 sets"),
-    ci(`${p}w8`,"Squats — 1 min × 3 sets"),
-    ci(`${p}w9`,"Elevated hip raises — 20s × 3 sets"),
-    ci(`${p}w10`,"High bar knee raises — 10 reps"),
-    ci(`${p}w11`,"P bar knee raises — 10 reps"),
-    ci(`${p}w12`,"Straight and lateral flutter kicks — 10 straight, 10 lateral"),
-    ci(`${p}w13`,"Floor hollow hold — 30s × 2 sets"),
-  ]};
+  return {title:"Calisthenics Workout (Day 6)", type:"lift", items:
+    CALIS_DAYS[5].items.map((text, i) => ci(`${p}w${i+1}`, text))
+  };
 }
 
-function calisAddOn(p) {
-  return {title:"Calisthenics Add-On", type:"finisher", items:[
-    ci(`${p}ao1`,"Classic push-ups — ladder from 10 down to 1"),
-    ci(`${p}ao2`,"Box dips — ladder from 10 down to 1"),
-  ]};
-}
-
+function calisAddOn(p) { return null; }
 function calisPostMob(p) {
   return {title:"Post-Calisthenics Mobility", type:"mobility", items:[
     ci(`${p}m1`,"90–90 hip stretch — 10 slow rotations per side"),
@@ -1660,10 +1802,9 @@ if (!state.checked) state.checked = {};
 if (!state.customWeights) state.customWeights = {};
 if (!state.setNotes) state.setNotes = {};
 if (!state.sessionNotes) state.sessionNotes = {};
-if (!state.weekDoneOverride) state.weekDoneOverride = {};
-if (!state.sessionOrder) state.sessionOrder = {};
-if (!state.archivedSessions) state.archivedSessions = {};
-// state.archivedSessions = { sessionId: [ {date, sessionNote, checked, setNotes, archivedAt}, ... ] }
+if (!state.calisSelectedDay) state.calisSelectedDay = 1;
+if (!state.calisWeekDay) state.calisWeekDay = {};
+if (!state.calisDone) state.calisDone = {};
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -1686,15 +1827,6 @@ function sessionProgress(sessionId, session) {
 }
 
 function weekDone(weekIdx) {
-  if (state.weekDoneOverride && state.weekDoneOverride[weekIdx]) return true;
-  const week = WEEKS[weekIdx];
-  return week.sessions.every(s => {
-    const p = sessionProgress(s.id, s);
-    return p.total === 0 || p.pct === 100;
-  });
-}
-
-function weekNaturallyDone(weekIdx) {
   const week = WEEKS[weekIdx];
   return week.sessions.every(s => {
     const p = sessionProgress(s.id, s);
@@ -1709,9 +1841,7 @@ function renderGoals() {
   const week = WEEKS[state.currentWeek];
   const weekIdx = state.currentWeek;
   const wts = getWeekWeights(weekIdx);
-
-  let html = '';
-  html += `<div class="goals-banner">`;
+  let html = `<div class="goals-banner">`;
   html += `<div class="goals-title">Week ${week.num} Goals</div>`;
   html += week.goals.map(g => `<div class="goals-text">• ${g}</div>`).join('');
   if (wts) {
@@ -1731,16 +1861,6 @@ function renderGoals() {
     }
     html += `</div>`;
   }
-  // Mark Week Done button
-  const natDone = weekNaturallyDone(weekIdx);
-  const overrideDone = !!(state.weekDoneOverride && state.weekDoneOverride[weekIdx]);
-  if (!natDone) {
-    if (overrideDone) {
-      html += `<button class="mark-done-btn done-override" onclick="toggleWeekDone(${weekIdx})">✓ Week Marked Done — tap to undo</button>`;
-    } else {
-      html += `<button class="mark-done-btn activatable" onclick="toggleWeekDone(${weekIdx})">☑ Mark Week Done</button>`;
-    }
-  }
   html += `</div>`;
   document.getElementById('week-goals').innerHTML = html;
 }
@@ -1748,30 +1868,19 @@ function renderGoals() {
 // ═══════════════════════════════════════════════
 //  RENDER SESSIONS
 // ═══════════════════════════════════════════════
-function getOrderedSessions(weekIdx) {
-  const week = WEEKS[weekIdx];
-  const order = state.sessionOrder && state.sessionOrder[weekIdx];
-  if (!order) return [...week.sessions];
-  return order.map(id => week.sessions.find(s => s.id === id)).filter(Boolean);
-}
-
 function renderSessions() {
-  const weekIdx = state.currentWeek;
-  const sessions = getOrderedSessions(weekIdx);
+  const week = WEEKS[state.currentWeek];
   let html = '';
-  for (const session of sessions) {
-    html += renderSessionCard(session, weekIdx);
+  for (const session of week.sessions) {
+    html += renderSessionCard(session);
   }
   document.getElementById('sessions-container').innerHTML = html;
 }
 
-function renderSessionCard(session, weekIdx) {
-  if (weekIdx === undefined) weekIdx = state.currentWeek;
+function renderSessionCard(session) {
   const prog = sessionProgress(session.id, session);
   const isOpen = state.openSessions && state.openSessions[session.id];
   const dateVal = state.dates[session.id] || '';
-  const archives = (state.archivedSessions && state.archivedSessions[session.id]) || [];
-  const isCalis = session.type.includes('Calis');
 
   let typeColor = '#888';
   if (session.type.includes('Lift A')) typeColor = '#5b9bd5';
@@ -1786,31 +1895,8 @@ function renderSessionCard(session, weekIdx) {
     const bc = session.badgeType === 'redo' ? 'redo' : '';
     badgeHtml = `<div class="sh-badge ${bc}">${session.badge}</div>`;
   }
-  // Show archived date badges (yellow, tappable)
-  if (archives.length > 0) {
-    badgeHtml += archives.map((a, i) => {
-      const label = a.date ? a.date : `Archive ${i+1}`;
-      return `<span class="archive-badge" onclick="event.stopPropagation();viewArchive('${session.id}',${i})">${label}</span>`;
-    }).join('');
-  }
 
   const pctHtml = prog.total > 0 ? `<span class="sh-pct">${prog.pct}%</span>` : '';
-
-  // Swap buttons for calisthenics sessions
-  let swapHtml = '';
-  if (isCalis) {
-    const sessions = getOrderedSessions(weekIdx);
-    const idx = sessions.findIndex(s => s.id === session.id);
-    const canUp = idx > 0;
-    const canDown = idx < sessions.length - 1;
-    swapHtml = `<div class="swap-btns" title="Move calisthenics day">
-      <button class="swap-btn" onclick="event.stopPropagation();swapSession(${weekIdx},'${session.id}',-1)" ${canUp?'':'disabled'} title="Move earlier in week">↑</button>
-      <button class="swap-btn" onclick="event.stopPropagation();swapSession(${weekIdx},'${session.id}',1)" ${canDown?'':'disabled'} title="Move later in week">↓</button>
-    </div>`;
-  }
-
-  // Archive day button
-  const saveBtn = `<button class="save-day-btn${archives.length>0?' has-archive':''}" onclick="event.stopPropagation();archiveDay(${weekIdx},'${session.id}')" title="Archive this day and reset">📌</button>`;
 
   let html = `
   <div class="session-card${isOpen ? ' open' : ''}" id="sc-${session.id}">
@@ -1823,8 +1909,6 @@ function renderSessionCard(session, weekIdx) {
       </div>
       <div class="sh-right">
         ${pctHtml}
-        ${swapHtml}
-        ${saveBtn}
         <span class="sh-chevron">⌄</span>
       </div>
     </div>
@@ -1849,8 +1933,9 @@ function renderSessionCard(session, weekIdx) {
 
 function renderSections(session) {
   let html = '';
-  for (let i = 0; i < session.sections.length; i++) {
-    html += renderSection(session.id, session.sections[i], i);
+  const secs = (session.sections || []).filter(Boolean);
+  for (let i = 0; i < secs.length; i++) {
+    html += renderSection(session.id, secs[i], i);
   }
   return html;
 }
@@ -2531,16 +2616,28 @@ function renderTodayBanner() {
   const dow = new Date().getDay();
   const dayName = DOW_MAP[dow];
   if (!dayName) { slot.innerHTML = ''; return; }
-  // Find the first session of that day type in current week
   const week = WEEKS[state.currentWeek];
   const session = week.sessions.find(s => s.day === dayName);
   if (!session) { slot.innerHTML = ''; return; }
   const icon = dow===1 ? '💪' : dow===3 ? '🤸' : '🏋️';
+
+  // For Wednesday calisthenics, show the assigned day number
+  let sessionLabel = session.type + (session.subtitle ? ' — ' + session.subtitle : '');
+  if (dow === 3 && session.type === 'Calisthenics') {
+    const weekIdx = state.currentWeek || 0;
+    const assignedDayNum = state.calisWeekDay && state.calisWeekDay[weekIdx] ? state.calisWeekDay[weekIdx] : null;
+    if (assignedDayNum) {
+      const assignedObj = CALIS_DAYS.find(d => d.num === assignedDayNum);
+      const assignedLabel = assignedObj ? (assignedObj.isRest ? 'Rest Day' : 'Day ' + assignedObj.num) : 'Day ' + assignedDayNum;
+      sessionLabel = `Calisthenics — ${assignedLabel}`;
+    }
+  }
+
   slot.innerHTML = `<div class="today-banner" onclick="scrollToSession('${session.id}')">
     <div class="today-icon">${icon}</div>
     <div class="today-text">
       <div class="today-label">Today · ${dayName}</div>
-      <div class="today-session">${session.type} — ${session.subtitle || ''}</div>
+      <div class="today-session">${sessionLabel}</div>
     </div>
     <div class="today-arrow">→</div>
   </div>`;
@@ -2560,63 +2657,140 @@ function scrollToSession(sessionId) {
 }
 
 // ═══════════════════════════════════════════════
-//  CALISTHENICS EXPLORER TAB
+//  CALISTHENICS LEVEL 1 TAB
 // ═══════════════════════════════════════════════
 function renderCalis() {
   const cont = document.getElementById('calis-content');
-  // Gather all calisthenics sessions across all weeks
-  const entries = [];
-  for (const week of WEEKS) {
-    for (const session of week.sessions) {
-      if (session.type.toLowerCase().includes('cali') || session.subtitle && session.subtitle.toLowerCase().includes('cali') || session.type === 'Day 6' || (session.sections && session.sections.some(s => s.title && s.title.toLowerCase().includes('cali')))) {
-        entries.push({week, session});
-      }
-    }
+  const sel = state.calisSelectedDay || 1;
+  const weekIdx = state.currentWeek || 0;
+  const weekLabel = WEEKS[weekIdx] ? WEEKS[weekIdx].label : 'Week 1';
+  const assignedDay = state.calisWeekDay[weekIdx] || sel;
+
+  // Day picker chips
+  let chips = '';
+  for (const d of CALIS_DAYS) {
+    const isActive = d.num === sel;
+    chips += `<button class="calis-chip${isActive?' active':''}${d.isRest?' rest':''}" onclick="calSelectDay(${d.num})">${d.isRest ? '😴 Rest' : 'Day '+d.num}</button>`;
   }
-  if (!entries.length) {
-    cont.innerHTML = `<div class="hist-empty"><div class="hist-empty-icon">🤸</div><div>No calisthenics sessions found.</div></div>`;
-    return;
-  }
-  let html = `<div style="margin-bottom:12px;font-size:13px;color:var(--txt2)">All calisthenics days across the 12 weeks. Tap to view any session.</div>`;
-  let lastWeek = -1;
-  for (const {week, session} of entries) {
-    if (week.num !== lastWeek) {
-      html += `<div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);font-weight:600;margin:12px 0 6px">${week.label} — ${week.phase}</div>`;
-      lastWeek = week.num;
-    }
-    const prog = sessionProgress(session.id, session);
-    const pct = prog.total > 0 ? prog.pct : null;
-    html += `<div class="session-card${state.openSessions && state.openSessions[session.id+'-calis'] ? ' open' : ''}" id="csc-${session.id}" style="margin-bottom:8px">
-      <div class="session-head" onclick="toggleCalisSession('${session.id}','${week.num - 1}')">
-        <div class="sh-left">
-          <div class="sh-day">${session.day}</div>
-          <div class="sh-title" style="color:var(--purple)">${session.type}</div>
-          ${session.subtitle ? `<div class="sh-sub">${session.subtitle}</div>` : ''}
-        </div>
-        <div class="sh-right">
-          ${pct !== null ? `<span class="sh-pct">${pct}%</span>` : ''}
-          <span class="sh-chevron">⌄</span>
-        </div>
-      </div>
-      <div class="prog-bar"><div class="prog-fill${prog.pct===100?' full':''}" style="width:${prog.pct}%"></div></div>
-      <div class="session-body">
-        <div class="date-row">
-          <span class="date-lbl">Date</span>
-          <input class="date-inp" type="date" value="${state.dates[session.id]||''}" onchange="setDate('${session.id}', this.value)" />
-        </div>
-        ${renderSections(session)}
-      </div>
+
+  // Assign bar
+  const assignedDayObj = CALIS_DAYS.find(d => d.num === assignedDay);
+  const assignedLabel = assignedDayObj ? (assignedDayObj.isRest ? 'Rest Day' : 'Day '+assignedDayObj.num) : 'Day '+assignedDay;
+  const assignBar = `<div class="calis-assign-bar">
+    <div>
+      <div class="calis-assign-info">${weekLabel} is set to</div>
+      <div class="calis-assign-week">🤸 ${assignedLabel}</div>
+    </div>
+    <button class="calis-assign-btn" onclick="calAssignToWeek(${sel})">📌 Assign Day ${sel} to ${weekLabel}</button>
+  </div>`;
+
+  // Workout content for selected day
+  const dayObj = CALIS_DAYS.find(d => d.num === sel);
+  let content = '';
+
+  if (!dayObj || dayObj.isRest) {
+    content = `<div class="calis-rest-card">
+      <div class="calis-rest-icon">😴</div>
+      <div class="calis-rest-title">Rest Day</div>
+      <div class="calis-rest-sub">Recovery is part of the program. Take it easy today.</div>
     </div>`;
+  } else {
+    // Progress for this day
+    const doneKey = `day${sel}`;
+    const done = state.calisDone[doneKey] || {};
+    const totalItems = CALIS_WARMUP.length + dayObj.items.length;
+    const doneCount = Object.values(done).filter(Boolean).length;
+    const pct = totalItems > 0 ? Math.round((doneCount/totalItems)*100) : 0;
+
+    content += `<div class="calis-progress-row">
+      <div class="calis-prog-bar"><div class="calis-prog-fill${pct===100?' done':''}" style="width:${pct}%"></div></div>
+      <div class="calis-prog-label">${doneCount}/${totalItems} done</div>
+      ${doneCount>0 ? `<button class="calis-clear-btn" onclick="calClearDay(${sel})">reset</button>` : ''}
+    </div>`;
+
+    // Warmup card (collapsible)
+    const wuOpen = state.calisWarmupOpen ? ' open' : '';
+    content += `<div class="calis-wu-card${wuOpen}" id="calis-wu-card">
+      <div class="calis-wu-head" onclick="calToggleWarmup()">
+        <div class="calis-wu-title">🔥 Warmup</div>
+        <div class="calis-wu-toggle">⌄</div>
+      </div>
+      <div class="calis-wu-body">`;
+    CALIS_WARMUP.forEach((item, i) => {
+      const itemKey = `wu${i}`;
+      const isDone = !!done[itemKey];
+      content += `<div class="calis-wu-item${isDone?' done':''}" onclick="calToggleItem(${sel}, '${itemKey}')">
+        <div class="calis-wu-dot"></div>
+        <span style="${isDone?'text-decoration:line-through;color:var(--txt3)':''}">${item}</span>
+      </div>`;
+    });
+    content += `</div></div>`;
+
+    // Workout exercises card
+    content += `<div class="calis-ex-card">
+      <div class="calis-ex-head">💪 Workout — ${dayObj.label}</div>`;
+    dayObj.items.forEach((item, i) => {
+      const itemKey = `ex${i}`;
+      const isDone = !!done[itemKey];
+      content += `<div class="calis-ex-item${isDone?' done':''}" onclick="calToggleItem(${sel}, '${itemKey}')">
+        <div class="calis-ex-cb"><span class="calis-ex-cb-check">✓</span></div>
+        <div class="calis-ex-text">${item}</div>
+      </div>`;
+    });
+    content += `</div>`;
   }
-  cont.innerHTML = html;
+
+  cont.innerHTML = `
+    <div class="calis-header">
+      <div>
+        <div class="calis-title">🤸 Calisthenics</div>
+        <div class="calis-subtitle">Level 1 — 13-Day Program</div>
+      </div>
+    </div>
+    <div class="calis-day-scroll"><div class="calis-day-row">${chips}</div></div>
+    ${assignBar}
+    ${content}`;
 }
-function toggleCalisSession(sessionId, weekIdx) {
-  if (!state.openSessions) state.openSessions = {};
-  const key = sessionId + '-calis';
-  state.openSessions[key] = !state.openSessions[key];
+
+function calSelectDay(dayNum) {
+  state.calisSelectedDay = dayNum;
   saveState(state);
-  const card = document.getElementById(`csc-${sessionId}`);
-  if (card) card.classList.toggle('open', !!state.openSessions[key]);
+  renderCalis();
+}
+
+function calAssignToWeek(dayNum) {
+  const weekIdx = state.currentWeek || 0;
+  state.calisWeekDay[weekIdx] = dayNum;
+  if (!state.calisSwap) state.calisSwap = {};
+  state.calisSwap[weekIdx] = dayNum;
+  saveState(state);
+  renderTodayBanner();
+  renderSessions();
+  renderCalis();
+  const btn = document.querySelector('.calis-assign-btn');
+  if (btn) { btn.textContent = '✓ Assigned!'; setTimeout(() => renderCalis(), 1200); }
+}
+
+function calToggleItem(dayNum, itemKey) {
+  const doneKey = `day${dayNum}`;
+  if (!state.calisDone[doneKey]) state.calisDone[doneKey] = {};
+  state.calisDone[doneKey][itemKey] = !state.calisDone[doneKey][itemKey];
+  saveState(state);
+  renderCalis();
+}
+
+function calClearDay(dayNum) {
+  const doneKey = `day${dayNum}`;
+  state.calisDone[doneKey] = {};
+  saveState(state);
+  renderCalis();
+}
+
+function calToggleWarmup() {
+  state.calisWarmupOpen = !state.calisWarmupOpen;
+  saveState(state);
+  const card = document.getElementById('calis-wu-card');
+  if (card) card.classList.toggle('open', !!state.calisWarmupOpen);
 }
 
 // ═══════════════════════════════════════════════
@@ -2683,153 +2857,6 @@ function renderLiftChart(history) {
       <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" style="overflow:visible">${svgPaths}</svg>
     </div>
   </div>`;
-}
-
-// ═══════════════════════════════════════════════
-//  ARCHIVE DAY
-// ═══════════════════════════════════════════════
-function archiveDay(weekIdx, sessionId) {
-  const week = WEEKS[weekIdx];
-  const session = week.sessions.find(s => s.id === sessionId);
-  if (!session) return;
-
-  // Snapshot current session data
-  const allItems = getAllItems(session);
-  const checkedSnap = {};
-  const setNotesSnap = {};
-  allItems.forEach(item => {
-    const key = `${sessionId}:${item.id}`;
-    if (state.checked[key]) checkedSnap[key] = true;
-    if (state.setNotes[key]) setNotesSnap[key] = JSON.parse(JSON.stringify(state.setNotes[key]));
-  });
-
-  const doneCount = Object.keys(checkedSnap).length;
-  const totalCount = allItems.filter(i => !i.info).length;
-
-  const archive = {
-    date: state.dates[sessionId] || new Date().toLocaleDateString('en-US', {month:'numeric',day:'numeric',year:'2-digit'}),
-    sessionNote: state.sessionNotes[sessionId] || '',
-    checked: checkedSnap,
-    setNotes: setNotesSnap,
-    doneCount,
-    totalCount,
-    archivedAt: Date.now(),
-    sessionItems: allItems.filter(i => !i.info && !i.sublabel).map(i => ({id: i.id, text: i.text}))
-  };
-
-  if (!state.archivedSessions) state.archivedSessions = {};
-  if (!state.archivedSessions[sessionId]) state.archivedSessions[sessionId] = [];
-  state.archivedSessions[sessionId].push(archive);
-
-  // Reset the session
-  allItems.forEach(item => {
-    const key = `${sessionId}:${item.id}`;
-    delete state.checked[key];
-    delete state.setNotes[key];
-  });
-  delete state.dates[sessionId];
-  delete state.sessionNotes[sessionId];
-
-  saveState(state);
-  renderAll();
-}
-
-function viewArchive(sessionId, archiveIdx) {
-  if (!state.archivedSessions || !state.archivedSessions[sessionId]) return;
-  const archive = state.archivedSessions[sessionId][archiveIdx];
-  if (!archive) return;
-
-  const pct = archive.totalCount > 0 ? Math.round(archive.doneCount / archive.totalCount * 100) : 0;
-
-  let itemsHtml = '';
-  if (archive.sessionItems && archive.sessionItems.length > 0) {
-    itemsHtml = `<div class="archive-modal-note-lbl" style="margin-bottom:8px">Exercises</div>
-    <div class="archive-checked-list">` +
-    archive.sessionItems.map(item => {
-      const key = `${sessionId}:${item.id}`;
-      const done = !!archive.checked[key];
-      const sn = archive.setNotes[key];
-      let snHtml = '';
-      if (sn && sn.tag) snHtml = `<div class="archive-set-note">${sn.tag}</div>`;
-      return `<div class="archive-checked-item${done?' done':''}">
-        <span class="archive-check-icon">${done ? '✅' : '⬜'}</span>
-        <span>${item.text}</span>
-      </div>${snHtml}`;
-    }).join('') + `</div>`;
-  }
-
-  const noteHtml = archive.sessionNote
-    ? `<div class="archive-modal-note-lbl">Session Note</div>
-       <div class="archive-modal-note">${archive.sessionNote}</div>`
-    : '';
-
-  const modalHtml = `<div class="archive-modal-overlay" onclick="closeArchiveModal(event)">
-    <div class="archive-modal" onclick="event.stopPropagation()">
-      <div class="archive-modal-hd">
-        <div class="archive-modal-title">📌 Archived Day</div>
-        <button class="archive-modal-close" onclick="closeArchiveModal()">×</button>
-      </div>
-      <div class="archive-modal-date">${archive.date} &nbsp;·&nbsp; ${pct}% complete</div>
-      ${noteHtml}
-      ${itemsHtml}
-      <button class="archive-delete-btn" onclick="deleteArchive('${sessionId}',${archiveIdx})">Delete this archive</button>
-    </div>
-  </div>`;
-
-  const el = document.createElement('div');
-  el.id = 'archive-modal-root';
-  el.innerHTML = modalHtml;
-  document.body.appendChild(el);
-}
-
-function closeArchiveModal(e) {
-  if (e && e.target !== e.currentTarget) return;
-  const el = document.getElementById('archive-modal-root');
-  if (el) el.remove();
-}
-
-function deleteArchive(sessionId, archiveIdx) {
-  if (!state.archivedSessions || !state.archivedSessions[sessionId]) return;
-  state.archivedSessions[sessionId].splice(archiveIdx, 1);
-  if (state.archivedSessions[sessionId].length === 0) delete state.archivedSessions[sessionId];
-  saveState(state);
-  closeArchiveModal();
-  renderAll();
-}
-
-function _legacyGoToSavedDay() {
-  // kept as stub for any old saved state references
-  return;
-}
-
-// ═══════════════════════════════════════════════
-//  SWAP CALISTHENICS DAY
-// ═══════════════════════════════════════════════
-function swapSession(weekIdx, sessionId, dir) {
-  const sessions = getOrderedSessions(weekIdx);
-  const ids = sessions.map(s => s.id);
-  const idx = ids.indexOf(sessionId);
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= ids.length) return;
-  // Swap positions
-  const tmp = ids[idx];
-  ids[idx] = ids[newIdx];
-  ids[newIdx] = tmp;
-  if (!state.sessionOrder) state.sessionOrder = {};
-  state.sessionOrder[weekIdx] = ids;
-  saveState(state);
-  renderAll();
-}
-
-// ═══════════════════════════════════════════════
-//  MARK WEEK DONE
-// ═══════════════════════════════════════════════
-function toggleWeekDone(weekIdx) {
-  if (!state.weekDoneOverride) state.weekDoneOverride = {};
-  state.weekDoneOverride[weekIdx] = !state.weekDoneOverride[weekIdx];
-  saveState(state);
-  renderHeader();
-  renderGoals();
 }
 
 // ═══════════════════════════════════════════════
