@@ -33,15 +33,16 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .week-label{font-size:18px;font-weight:700;letter-spacing:-.3px}
 .week-sub{font-size:11px;color:var(--txt2);margin-top:1px}
 .week-dots{display:flex;justify-content:center;gap:5px;margin-top:8px;flex-wrap:wrap}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s}
-.dot.active{background:var(--accent);transform:scale(1.3)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all .2s;touch-action:manipulation}
+.dot.active{background:var(--accent);transform:scale(1.25)}
 .dot.done{background:var(--green)}
 .dot.transition{background:var(--purple)}
 
 /* ── Tabs ── */
 #tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;color:var(--txt3);background:none;border:none;font-size:10px;text-transform:uppercase;letter-spacing:.08em;gap:3px;touch-action:manipulation}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;color:var(--txt3);background:none;border:none;font-size:10px;text-transform:uppercase;letter-spacing:.08em;gap:3px;touch-action:manipulation;position:relative}
 .tab.active{color:var(--accent)}
+.tab.active::before{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--accent);border-radius:0 0 2px 2px}
 .tab-icon{font-size:20px}
 
 /* ── Tab views ── */
@@ -64,7 +65,8 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .w-unit{font-size:10px;color:var(--txt3)}
 
 /* ── Session card ── */
-.session-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.session-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color .3s}
+.session-card.completed{border-color:#2d5c2d}
 .session-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;touch-action:manipulation;user-select:none}
 .session-head:active{background:var(--surf2)}
 .sh-left{}
@@ -74,11 +76,12 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .sh-badge{display:inline-block;background:#1e1200;border:1px solid var(--accent-dim);color:var(--accent);font-size:10px;padding:2px 7px;border-radius:20px;margin-top:4px;font-weight:600;letter-spacing:.05em}
 .sh-badge.redo{background:#1a1025;border-color:#5b2f8c;color:var(--purple)}
 .sh-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.sh-pct{font-size:12px;color:var(--txt2)}
+.sh-pct{font-size:12px;color:var(--txt2);font-variant-numeric:tabular-nums;font-weight:600}
+.sh-pct.full{color:var(--green);font-size:13px}
 .sh-chevron{color:var(--txt4);font-size:20px;transition:transform .2s}
 .session-card.open .sh-chevron{transform:rotate(180deg)}
-.prog-bar{height:3px;background:var(--border)}
-.prog-fill{height:100%;background:var(--accent);transition:width .3s}
+.prog-bar{height:5px;background:var(--border);border-radius:0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px);overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);transition:width .35s ease}
 .prog-fill.full{background:var(--green)}
 
 /* ── Session body ── */
@@ -208,7 +211,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .rest-timer.visible{display:flex}
 .rt-left{flex-shrink:0}
 .rt-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px}
-.rt-time{font-size:26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1}
+.rt-time{font-size:34px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.5px}
 .rt-time.done{color:var(--green)}
 .rt-presets{display:flex;gap:5px}
 .rt-preset{background:var(--surf2);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;font-size:12px;color:var(--txt2);cursor:pointer;touch-action:manipulation}
@@ -1809,9 +1812,39 @@ if (!state.calisDone) state.calisDone = {};
 // ═══════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════
-function getAllItems(session) {
+// Returns sections for a calis session swapped to an assigned day, or null if no swap.
+function getSwappedCalisSections(session, weekIdx) {
+  const assignedDayNum = state.calisWeekDay && state.calisWeekDay[weekIdx];
+  if (!assignedDayNum) return null;
+  const dayObj = CALIS_DAYS.find(d => d.num === assignedDayNum);
+  if (!dayObj) return null;
+  if (dayObj.isRest) {
+    return [{title:'Rest Day 😴', type:'mobility', items:[
+      ci(`${session.id}-rest-1`, 'Active rest — walk, stretch, or sleep early'),
+    ]}];
+  }
+  const p = `${session.id}-d${assignedDayNum}-`;
+  return [
+    {title:'Warmup', type:'warmup', items: CALIS_WARMUP.map((text, i) => ci(`${p}wu${i}`, text))},
+    {title:`Workout — ${dayObj.label}`, type:'lift', items: dayObj.items.map((text, i) => ci(`${p}ex${i}`, text))},
+  ];
+}
+
+// Returns the effective sections to render for a session (swaps calis if assigned).
+function getEffectiveSections(session, weekIdx) {
+  if (session.type === 'Calisthenics') {
+    const swapped = getSwappedCalisSections(session, weekIdx);
+    if (swapped) return swapped;
+  }
+  return (session.sections || []).filter(Boolean);
+}
+
+function getAllItems(session, weekIdx) {
+  const sections = weekIdx !== undefined
+    ? getEffectiveSections(session, weekIdx)
+    : (session.sections || []).filter(Boolean);
   const items = [];
-  for (const sec of session.sections) {
+  for (const sec of sections) {
     if (!sec) continue;
     for (const it of sec.items) {
       if (!it.sublabel) items.push(it);
@@ -1820,8 +1853,8 @@ function getAllItems(session) {
   return items;
 }
 
-function sessionProgress(sessionId, session) {
-  const items = getAllItems(session).filter(i => !i.info);
+function sessionProgress(sessionId, session, weekIdx) {
+  const items = getAllItems(session, weekIdx).filter(i => !i.info);
   if (!items.length) return {done:0, total:0, pct:0};
   const done = items.filter(i => state.checked[`${sessionId}:${i.id}`]).length;
   return {done, total:items.length, pct: Math.round(done/items.length*100)};
@@ -1830,7 +1863,7 @@ function sessionProgress(sessionId, session) {
 function weekDone(weekIdx) {
   const week = WEEKS[weekIdx];
   return week.sessions.every(s => {
-    const p = sessionProgress(s.id, s);
+    const p = sessionProgress(s.id, s, weekIdx);
     return p.total === 0 || p.pct === 100;
   });
 }
@@ -1879,9 +1912,19 @@ function renderSessions() {
 }
 
 function renderSessionCard(session) {
-  const prog = sessionProgress(session.id, session);
+  const weekIdx = state.currentWeek || 0;
+  const prog = sessionProgress(session.id, session, weekIdx);
   const isOpen = state.openSessions && state.openSessions[session.id];
   const dateVal = state.dates[session.id] || '';
+  // For Calisthenics sessions, show the assigned day in the subtitle
+  let effectiveSubtitle = session.subtitle;
+  if (session.type === 'Calisthenics') {
+    const assignedDayNum = state.calisWeekDay && state.calisWeekDay[weekIdx];
+    if (assignedDayNum) {
+      const dayObj = CALIS_DAYS.find(d => d.num === assignedDayNum);
+      effectiveSubtitle = dayObj ? (dayObj.isRest ? 'Rest Day' : `Day ${dayObj.num}`) : `Day ${assignedDayNum}`;
+    }
+  }
 
   let typeColor = '#888';
   if (session.type.includes('Lift A')) typeColor = '#5b9bd5';
@@ -1897,15 +1940,16 @@ function renderSessionCard(session) {
     badgeHtml = `<div class="sh-badge ${bc}">${session.badge}</div>`;
   }
 
-  const pctHtml = prog.total > 0 ? `<span class="sh-pct">${prog.pct}%</span>` : '';
+  const isDone = prog.pct === 100;
+  const pctHtml = prog.total > 0 ? `<span class="sh-pct${isDone ? ' full' : ''}">${isDone ? '✓ Done' : `${prog.done}/${prog.total}`}</span>` : '';
 
   let html = `
-  <div class="session-card${isOpen ? ' open' : ''}" id="sc-${session.id}">
+  <div class="session-card${isOpen ? ' open' : ''}${isDone ? ' completed' : ''}" id="sc-${session.id}">
     <div class="session-head" onclick="toggleSession('${session.id}')">
       <div class="sh-left">
         <div class="sh-day">${session.day}</div>
         <div class="sh-title" style="color:${typeColor}">${session.type}</div>
-        ${session.subtitle ? `<div class="sh-sub">${session.subtitle}</div>` : ''}
+        ${effectiveSubtitle ? `<div class="sh-sub">${effectiveSubtitle}</div>` : ''}
         ${badgeHtml}
       </div>
       <div class="sh-right">
@@ -1934,7 +1978,8 @@ function renderSessionCard(session) {
 
 function renderSections(session) {
   let html = '';
-  const secs = (session.sections || []).filter(Boolean);
+  const weekIdx = state.currentWeek || 0;
+  const secs = getEffectiveSections(session, weekIdx);
   for (let i = 0; i < secs.length; i++) {
     html += renderSection(session.id, secs[i], i);
   }
@@ -1944,6 +1989,40 @@ function renderSections(session) {
 function renderSection(sessionId, sec, sectionIdx) {
   const isWarmup = sec.type === 'warmup';
   const isLift = sec.type === 'lift';
+
+  // ── Weight substitution for barbell lift sections ──
+  // Detect if this section belongs to one of the 4 main lifts by its title,
+  // then substitute weights in item text:
+  //   • Exact working weight      → replaced with custom weight
+  //   • ≥88% of working weight    → scaled proportionally (ramp-up set)
+  //   • Everything else           → unchanged (absolute warmup steps)
+  let displayTitle = sec.title;
+  let applyWeightSub = null; // fn(text) => text
+  if (isLift) {
+    const liftEntry = LIFT_KEY_MAP.find(l => l.re.test(sec.title));
+    if (liftEntry) {
+      const baseMatch = sec.title.match(/(\d+)\s*lb/i);
+      if (baseMatch) {
+        const baseWt = parseInt(baseMatch[1]);
+        const weekIdx = state.currentWeek || 0;
+        const wts = getWeekWeights(weekIdx);
+        const customWt = wts && wts[liftEntry.key];
+        if (customWt && customWt !== baseWt) {
+          displayTitle = sec.title.replace(String(baseWt), String(customWt));
+          const lowerBound = Math.floor(baseWt * 0.88);
+          applyWeightSub = text => text.replace(/\b(\d+)\b/g, (match, num) => {
+            const n = parseInt(num);
+            if (n === baseWt) return String(customWt);
+            if (n >= lowerBound && n < baseWt) {
+              return String(Math.round((customWt * n / baseWt) / 5) * 5);
+            }
+            return match;
+          });
+        }
+      }
+    }
+  }
+
   let html = `<div class="section">`;
 
   // Section header with optional warmup quick-complete
@@ -1951,11 +2030,11 @@ function renderSection(sessionId, sec, sectionIdx) {
     const wuItems = sec.items.filter(i => !i.sublabel && !i.info);
     const allDone = wuItems.length > 0 && wuItems.every(i => state.checked[`${sessionId}:${i.id}`]);
     html += `<div class="sec-hd-row">
-      <div class="sec-title ${sec.type||''}">${sec.title}</div>
+      <div class="sec-title ${sec.type||''}">${displayTitle}</div>
       <button class="wu-all-btn${allDone?' done-all':''}" onclick="quickCompleteWarmup('${sessionId}',${sectionIdx})">${allDone ? '✓ Done' : '✓ All'}</button>
     </div>`;
   } else {
-    html += `<div class="sec-title ${sec.type||''}">${sec.title}</div>`;
+    html += `<div class="sec-title ${sec.type||''}">${displayTitle}</div>`;
   }
 
   if (sec.personalNote) {
@@ -1981,12 +2060,13 @@ function renderSection(sessionId, sec, sectionIdx) {
     const sn = state.setNotes[key] || {};
     const badgeId = `tb-${key.replace(/:/g,'-')}`;
     const isWorkingSet = isLift && lastWasWorkingSet;
+    const displayText = applyWeightSub ? applyWeightSub(item.text) : item.text;
 
     html += `
     <div class="ci${done?' done':''}" onclick="handleCiClick(event,'${sessionId}','${item.id}',${isWorkingSet})">
       <div class="ci-box">${done ? '✓' : ''}</div>
       <div class="ci-body">
-        <div class="ci-text">${item.text}
+        <div class="ci-text">${displayText}
           <span class="ci-expand-note" onclick="event.stopPropagation();expandSetNote('${sessionId}','${item.id}',this)" title="Add note">💬</span>
         </div>
         ${item.note ? `<div class="ci-note">${item.note}</div>` : ''}
@@ -2107,7 +2187,8 @@ function setDate(sessionId, value) {
 }
 
 function updateSessionCard(sessionId, session) {
-  const prog = sessionProgress(sessionId, session);
+  const weekIdx = state.currentWeek || 0;
+  const prog = sessionProgress(sessionId, session, weekIdx);
   // Update progress bar
   const card = document.getElementById(`sc-${sessionId}`);
   if (!card) return;
@@ -2116,9 +2197,14 @@ function updateSessionCard(sessionId, session) {
     fill.style.width = prog.pct + '%';
     fill.classList.toggle('full', prog.pct === 100);
   }
+  card.classList.toggle('completed', prog.pct === 100);
   // Update pct text
   const pctEl = card.querySelector('.sh-pct');
-  if (pctEl && prog.total > 0) pctEl.textContent = prog.pct + '%';
+  if (pctEl && prog.total > 0) {
+    const done100 = prog.pct === 100;
+    pctEl.textContent = done100 ? '✓ Done' : `${prog.done}/${prog.total}`;
+    pctEl.classList.toggle('full', done100);
+  }
   // Update dot
   renderHeader();
   // Update individual check item
@@ -2149,12 +2235,12 @@ function updateSessionCard(sessionId, session) {
 //  HISTORY LOGGING
 // ═══════════════════════════════════════════════
 function logHistory(sessionId, session) {
-  const prog = sessionProgress(sessionId, session);
+  const weekIdx = state.currentWeek;
+  const prog = sessionProgress(sessionId, session, weekIdx);
   if (prog.done === 0) return;
   const date = state.dates[sessionId] || '';
   let history = loadHistory();
   const existIdx = history.findIndex(h => h.id === sessionId);
-  const weekIdx = state.currentWeek;
   const wts = getWeekWeights(weekIdx);
   const entry = {
     id: sessionId,
@@ -2351,6 +2437,12 @@ let _weEditIdx = -1;
 let _weApplyFuture = false;
 const LIFT_KEYS = ['squat','bench','deadlift','press'];
 const LIFT_LABELS = {squat:'Squat',bench:'Bench',deadlift:'Deadlift',press:'Press'};
+const LIFT_KEY_MAP = [
+  {key:'squat',    re:/back squat/i},
+  {key:'bench',    re:/bench press/i},
+  {key:'deadlift', re:/deadlift/i},
+  {key:'press',    re:/overhead press/i},
+];
 
 function openWeightModal(weekIdx) {
   _weEditIdx = weekIdx;
