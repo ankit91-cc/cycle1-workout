@@ -1812,6 +1812,7 @@ if (!state.calisDone) state.calisDone = {};
 function getAllItems(session) {
   const items = [];
   for (const sec of session.sections) {
+    if (!sec) continue;
     for (const it of sec.items) {
       if (!it.sublabel) items.push(it);
     }
