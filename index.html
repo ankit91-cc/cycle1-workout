@@ -102,6 +102,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .sec-title.cooldown{color:var(--teal)}
 .sec-title.mobility{color:var(--teal)}
 .sec-title.core{color:var(--purple)}
+.sec-title.ab{color:var(--red)}
 .sec-title.check{color:var(--green)}
 .sec-note{font-size:12px;color:var(--txt2);background:var(--surf2);border-left:2px solid var(--border2);padding:7px 10px;border-radius:0 8px 8px 0;margin-bottom:8px;line-height:1.5;font-style:italic}
 .sec-note.accent{border-color:var(--accent);color:var(--txt2)}
@@ -291,6 +292,30 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .calis-prog-label{font-size:11px;color:var(--txt3);white-space:nowrap}
 .calis-clear-btn{font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:2px 6px;touch-action:manipulation;text-decoration:underline}
 
+/* ── Abs Tab ── */
+.abs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.abs-title{font-size:18px;font-weight:800}
+.abs-subtitle{font-size:12px;color:var(--txt2);margin-top:2px}
+.abs-ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.abs-ex-head{padding:12px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
+.abs-ex-item{display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-top:1px solid var(--border);font-size:14px;color:var(--txt);cursor:pointer;touch-action:manipulation}
+.abs-ex-item.done{color:var(--txt3)}
+.abs-ex-cb{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.abs-ex-item.done .abs-ex-cb{background:var(--green);border-color:var(--green)}
+.abs-ex-cb-check{color:#000;font-size:13px;font-weight:700;display:none}
+.abs-ex-item.done .abs-ex-cb-check{display:block}
+.abs-ex-text{flex:1;line-height:1.4}
+.abs-ex-item.done .abs-ex-text{text-decoration:line-through}
+.abs-ex-note{font-size:11px;color:var(--txt3);margin-top:2px;font-style:italic}
+.abs-sublabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txt3);padding:8px 14px 4px;border-top:1px solid #1a1a1a}
+.abs-progress-row{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+.abs-prog-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.abs-prog-fill{height:100%;background:var(--red);border-radius:2px;transition:width .3s}
+.abs-prog-fill.done{background:var(--green)}
+.abs-prog-label{font-size:11px;color:var(--txt3);white-space:nowrap}
+.abs-clear-btn{font-size:11px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:2px 6px;touch-action:manipulation;text-decoration:underline}
+.abs-set-badge{display:inline-block;background:#1f0d0d;border:1px solid #5c1f1f;color:var(--red);font-size:10px;padding:2px 8px;border-radius:20px;margin-bottom:10px;font-weight:600;letter-spacing:.05em}
+
 /* ── Warmup Quick Complete ── */
 .sec-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-top:2px}
 .sec-hd-row .sec-title{margin-bottom:0;padding-top:0}
@@ -352,6 +377,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <button class="tab" id="tab-calis" onclick="switchTab('calis')">
     <span class="tab-icon">🤸</span>Calis
   </button>
+  <button class="tab" id="tab-abs" onclick="switchTab('abs')">
+    <span class="tab-icon">🔥</span>Abs
+  </button>
   <button class="tab" id="tab-recovery" onclick="switchTab('recovery')">
     <span class="tab-icon">🔄</span>Recovery
   </button>
@@ -372,6 +400,11 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 <!-- Calisthenics Tab -->
 <div id="view-calis" style="display:none;padding:12px">
   <div id="calis-content"></div>
+</div>
+
+<!-- Abs Tab -->
+<div id="view-abs" style="display:none;padding:12px">
+  <div id="abs-content"></div>
 </div>
 
 <!-- Recovery Guide Tab -->
@@ -590,6 +623,21 @@ const CALIS_DAYS = [
     "Floor hollow hold — 1 min",
     "Leg flutter kicks — 1 min",
   ]},
+];
+
+// ═══════════════════════════════════════════════
+//  AB ROUTINE DATA
+// ═══════════════════════════════════════════════
+const AB_EXERCISES = [
+  {text:"Weighted knee crunches × 8 reps", note:"Start 10 lb, increase slowly over time"},
+  {text:"Straight leg lift × 12 reps"},
+  {text:"Single leg knee up × 5 reps each leg"},
+  {text:"Around the world × 8 reps"},
+];
+const AB_SUPERSET = [
+  {text:"Side crunch × 4 each side"},
+  {text:"Regular crunch × 4 reps"},
+  {text:"Hold til failure"},
 ];
 
 // Standard calisthenics warmup (weeks 3-9) — now uses CALIS_WARMUP data
@@ -1808,6 +1856,7 @@ if (!state.sessionNotes) state.sessionNotes = {};
 if (!state.calisSelectedDay) state.calisSelectedDay = 1;
 if (!state.calisWeekDay) state.calisWeekDay = {};
 if (!state.calisDone) state.calisDone = {};
+if (!state.absDone) state.absDone = {};
 
 // ═══════════════════════════════════════════════
 //  HELPERS
@@ -1831,12 +1880,34 @@ function getSwappedCalisSections(session, weekIdx) {
 }
 
 // Returns the effective sections to render for a session (swaps calis if assigned).
+function buildAbSection(prefix) {
+  const items = [];
+  AB_EXERCISES.forEach((ex, i) => {
+    items.push(ci(`${prefix}ex${i}`, ex.text, ex.note || null));
+  });
+  items.push({id:`${prefix}ss-lbl`, text:'* Superset', sublabel:true});
+  AB_SUPERSET.forEach((ex, i) => {
+    items.push(ci(`${prefix}ss${i}`, ex.text));
+  });
+  return {
+    title:'Ab Routine — 3 Sets',
+    type:'ab',
+    note:'Rest 10–15 seconds between each exercise',
+    items
+  };
+}
+
 function getEffectiveSections(session, weekIdx) {
   if (session.type === 'Calisthenics') {
     const swapped = getSwappedCalisSections(session, weekIdx);
     if (swapped) return swapped;
   }
-  return (session.sections || []).filter(Boolean);
+  const secs = (session.sections || []).filter(Boolean);
+  const weekNum = WEEKS[weekIdx] ? WEEKS[weekIdx].num : 1;
+  if (weekNum >= 8 && session.type !== 'Week Check') {
+    secs.push(buildAbSection(`${session.id}-ab-`));
+  }
+  return secs;
 }
 
 function getAllItems(session, weekIdx) {
@@ -2404,7 +2475,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
 
-  const views = ['workout','history','calis','recovery'];
+  const views = ['workout','history','calis','abs','recovery'];
   for (const v of views) {
     const el = document.getElementById(`view-${v}`);
     if (el) {
@@ -2417,6 +2488,7 @@ function switchTab(tab) {
   if (tab === 'history') renderHistory();
   if (tab === 'recovery') renderRecovery();
   if (tab === 'calis') renderCalis();
+  if (tab === 'abs') renderAbs();
 }
 
 // ═══════════════════════════════════════════════
@@ -2884,6 +2956,68 @@ function calToggleWarmup() {
   saveState(state);
   const card = document.getElementById('calis-wu-card');
   if (card) card.classList.toggle('open', !!state.calisWarmupOpen);
+}
+
+// ═══════════════════════════════════════════════
+//  ABS TAB
+// ═══════════════════════════════════════════════
+function renderAbs() {
+  const cont = document.getElementById('abs-content');
+  const totalItems = AB_EXERCISES.length + AB_SUPERSET.length;
+  const done = state.absDone || {};
+  const doneCount = Object.values(done).filter(Boolean).length;
+  const pct = totalItems > 0 ? Math.round((doneCount / totalItems) * 100) : 0;
+
+  let content = `<div class="abs-progress-row">
+    <div class="abs-prog-bar"><div class="abs-prog-fill${pct===100?' done':''}" style="width:${pct}%"></div></div>
+    <div class="abs-prog-label">${doneCount}/${totalItems} done</div>
+    ${doneCount > 0 ? `<button class="abs-clear-btn" onclick="absClearAll()">reset</button>` : ''}
+  </div>`;
+
+  content += `<div class="abs-ex-card">
+    <div class="abs-ex-head">💪 Ab Routine — 3 Sets</div>
+    <div style="padding:8px 14px 2px"><span class="abs-set-badge">Rest 10–15s between each</span></div>`;
+
+  AB_EXERCISES.forEach((ex, i) => {
+    const isDone = !!done[`ex${i}`];
+    content += `<div class="abs-ex-item${isDone?' done':''}" onclick="absToggleItem('ex${i}')">
+      <div class="abs-ex-cb"><span class="abs-ex-cb-check">✓</span></div>
+      <div class="abs-ex-text">${ex.text}${ex.note ? `<div class="abs-ex-note">${ex.note}</div>` : ''}</div>
+    </div>`;
+  });
+
+  content += `<div class="abs-sublabel">★ Superset</div>`;
+  AB_SUPERSET.forEach((ex, i) => {
+    const isDone = !!done[`ss${i}`];
+    content += `<div class="abs-ex-item${isDone?' done':''}" onclick="absToggleItem('ss${i}')">
+      <div class="abs-ex-cb"><span class="abs-ex-cb-check">✓</span></div>
+      <div class="abs-ex-text">${ex.text}</div>
+    </div>`;
+  });
+
+  content += `</div>`;
+
+  cont.innerHTML = `
+    <div class="abs-header">
+      <div>
+        <div class="abs-title">🔥 Ab Routine</div>
+        <div class="abs-subtitle">3 sets · Added Week 8+</div>
+      </div>
+    </div>
+    ${content}`;
+}
+
+function absToggleItem(key) {
+  if (!state.absDone) state.absDone = {};
+  state.absDone[key] = !state.absDone[key];
+  saveState(state);
+  renderAbs();
+}
+
+function absClearAll() {
+  state.absDone = {};
+  saveState(state);
+  renderAbs();
 }
 
 // ═══════════════════════════════════════════════
