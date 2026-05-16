@@ -371,14 +371,14 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <button class="tab active" id="tab-workout" onclick="switchTab('workout')">
     <span class="tab-icon">🏋️</span>Workout
   </button>
-  <button class="tab" id="tab-history" onclick="switchTab('history')">
-    <span class="tab-icon">📋</span>History
-  </button>
   <button class="tab" id="tab-calis" onclick="switchTab('calis')">
     <span class="tab-icon">🤸</span>Calis
   </button>
   <button class="tab" id="tab-abs" onclick="switchTab('abs')">
     <span class="tab-icon">🔥</span>Abs
+  </button>
+  <button class="tab" id="tab-yoga" onclick="switchTab('yoga')">
+    <span class="tab-icon">🧘</span>Yoga
   </button>
   <button class="tab" id="tab-recovery" onclick="switchTab('recovery')">
     <span class="tab-icon">🔄</span>Recovery
@@ -392,11 +392,6 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <div id="sessions-container"></div>
 </div>
 
-<!-- History Tab -->
-<div id="view-history">
-  <div id="history-content"></div>
-</div>
-
 <!-- Calisthenics Tab -->
 <div id="view-calis" style="display:none;padding:12px">
   <div id="calis-content"></div>
@@ -405,6 +400,11 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 <!-- Abs Tab -->
 <div id="view-abs" style="display:none;padding:12px">
   <div id="abs-content"></div>
+</div>
+
+<!-- Yoga Tab -->
+<div id="view-yoga" style="display:none;padding:12px">
+  <div id="yoga-content"></div>
 </div>
 
 <!-- Recovery Guide Tab -->
@@ -2475,7 +2475,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
 
-  const views = ['workout','history','calis','abs','recovery'];
+  const views = ['workout','calis','abs','recovery','yoga'];
   for (const v of views) {
     const el = document.getElementById(`view-${v}`);
     if (el) {
@@ -2485,10 +2485,58 @@ function switchTab(tab) {
   }
   document.getElementById('header').style.display = tab === 'workout' ? '' : 'none';
 
-  if (tab === 'history') renderHistory();
   if (tab === 'recovery') renderRecovery();
   if (tab === 'calis') renderCalis();
   if (tab === 'abs') renderAbs();
+  if (tab === 'yoga') renderYoga();
+}
+
+// ═══════════════════════════════════════════════
+//  YOGA TAB
+// ═══════════════════════════════════════════════
+const YOGA_VIDEOS = [
+  { title: 'Morning Yoga Flow',    url: 'https://www.youtube.com/watch?v=Vr3h5X9kmUo&list=PLipSZg1JNsC_uKB9PQoIlTao6ZCWlnZPE', duration: '15 min' },
+  { title: 'Everyday Yoga',        url: 'https://www.youtube.com/watch?v=98rmMgBwJXE',                                           duration: '20 min' },
+  { title: 'Feel Good Yoga',       url: 'https://www.youtube.com/watch?v=poZBpvLTHNw',                                           duration: '20 min' },
+  { title: 'Yoga Flow',            url: 'https://www.youtube.com/watch?v=dqIZnyUtKXI',                                           duration: '25 min' },
+  { title: 'Yoga Flow',            url: 'https://www.youtube.com/watch?v=5TzqqPJFHeQ',                                           duration: '30 min' },
+  { title: 'Yoga Flow',            url: 'https://www.youtube.com/watch?v=2eC7TlC2NLs',                                           duration: '30 min' },
+  { title: 'Feel Good Yoga',       url: 'https://www.youtube.com/watch?v=RvCntPg7oPE',                                           duration: '30 min' },
+  { title: 'Full Body Stretch',    url: 'https://www.youtube.com/watch?v=-b-8Y3bh9AU',                                           duration: '30 min' },
+  { title: 'Yoga Pilates Flow',    url: 'https://www.youtube.com/watch?v=HIuJA4xS4WM',                                           duration: '30 min' },
+  { title: 'Yoga Workout',         url: 'https://www.youtube.com/watch?v=uqJ-jANozcE',                                           duration: '40 min' },
+  { title: 'Yoga Flow',            url: 'https://www.youtube.com/watch?v=7SU59GxGqbo',                                           duration: '40 min' },
+  { title: 'Yoga Pilates Flow',    url: 'https://www.youtube.com/watch?v=KmB6Fdj_XJg',                                           duration: '40 min' },
+];
+
+function renderYoga() {
+  const cont = document.getElementById('yoga-content');
+  let html = `<div style="margin-bottom:16px">
+    <div style="font-size:18px;font-weight:800">🧘 Yoga</div>
+    <div style="font-size:12px;color:var(--txt2);margin-top:2px">${YOGA_VIDEOS.length} videos</div>
+  </div>`;
+
+  const groups = {};
+  for (const v of YOGA_VIDEOS) {
+    if (!groups[v.duration]) groups[v.duration] = [];
+    groups[v.duration].push(v);
+  }
+
+  for (const [duration, videos] of Object.entries(groups)) {
+    html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin:16px 0 8px">${duration}</div>`;
+    for (const v of videos) {
+      html += `<a href="${v.url}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;text-decoration:none;color:var(--txt);">
+        <div style="width:36px;height:36px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="16" height="16" style="transform:translateX(1px)"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;">${v.title}</div>
+        </div>
+        <div style="font-size:18px;">↗</div>
+      </a>`;
+    }
+  }
+  cont.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════
@@ -2961,6 +3009,18 @@ function calToggleWarmup() {
 // ═══════════════════════════════════════════════
 //  ABS TAB
 // ═══════════════════════════════════════════════
+const ABS_VIDEOS = [
+  { title: '10 Min Abs',                  url: 'https://www.youtube.com/watch?v=JCERHtmVer4&list=PLipSZg1JNsC_uKB9PQoIlTao6ZCWlnZPE&index=18', duration: '10 min' },
+  { title: 'Pilates Core & Abs',          url: 'https://www.youtube.com/watch?v=Vr3h5X9kmUo',                                                    duration: '15 min' },
+  { title: 'Total Core',                  url: 'https://www.youtube.com/watch?v=aHknM6bNlYA',                                                    duration: '20 min' },
+  { title: 'Total Core / Ab',             url: 'https://www.youtube.com/watch?v=P4GukOvkeQQ',                                                    duration: '20 min' },
+  { title: 'Core & Abs',                  url: 'https://www.youtube.com/watch?v=dF2dXejdKHM',                                                    duration: '20 min' },
+  { title: 'Core — Mini Band',            url: 'https://www.youtube.com/watch?v=O1cubPjoB-E',                                                    duration: '20 min' },
+  { title: 'Tabata & Core',               url: 'https://www.youtube.com/watch?v=dRBp7o2sKcc',                                                    duration: '20 min' },
+  { title: 'Core & Abs',                  url: 'https://www.youtube.com/watch?v=mREx1RkRv5g',                                                    duration: '25 min' },
+  { title: 'Total Core / Ab',             url: 'https://www.youtube.com/watch?v=sQp904QUFc0',                                                    duration: '25 min' },
+  { title: 'Pilates Core',                url: 'https://www.youtube.com/watch?v=U5LwQW_IQOc',                                                    duration: '30 min' },
+];
 function renderAbs() {
   const cont = document.getElementById('abs-content');
   const totalItems = AB_EXERCISES.length + AB_SUPERSET.length;
@@ -2996,6 +3056,28 @@ function renderAbs() {
   });
 
   content += `</div>`;
+
+  content += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin:16px 0 8px">YouTube Videos</div>`;
+
+  const absGroups = {};
+  for (const v of ABS_VIDEOS) {
+    if (!absGroups[v.duration]) absGroups[v.duration] = [];
+    absGroups[v.duration].push(v);
+  }
+  for (const [duration, videos] of Object.entries(absGroups)) {
+    content += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin:12px 0 6px">${duration}</div>`;
+    for (const v of videos) {
+      content += `<a href="${v.url}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;text-decoration:none;color:var(--txt);">
+        <div style="width:36px;height:36px;background:#ff0000;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="16" height="16" style="transform:translateX(1px)"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;">${v.title}</div>
+        </div>
+        <div style="font-size:18px;">↗</div>
+      </a>`;
+    }
+  }
 
   cont.innerHTML = `
     <div class="abs-header">
