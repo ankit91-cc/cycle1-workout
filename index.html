@@ -345,6 +345,97 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .wt-save-btn{background:var(--accent);color:#000;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:700;width:100%;cursor:pointer;margin-top:12px;touch-action:manipulation}
 .wt-save-btn:active{opacity:.8}
 .wt-cancel-btn{background:var(--surf2);color:var(--txt2);border:1px solid var(--border2);border-radius:10px;padding:10px;font-size:14px;width:100%;cursor:pointer;margin-top:8px;touch-action:manipulation}
+
+/* ── Cardio tab ── */
+.cd-subnav{display:flex;background:var(--surf);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.cd-subnav-btn{flex:1;padding:10px 0;background:none;border:none;color:var(--txt3);font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s;touch-action:manipulation}
+.cd-subnav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+#cardio-content{padding:12px 0 80px}
+.cd-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin:0 12px 10px;overflow:hidden}
+.cd-section-lbl{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);padding:14px 16px 6px}
+.cd-btn{display:block;width:100%;padding:14px;border-radius:var(--radius);border:none;font-size:15px;font-weight:600;cursor:pointer;text-align:center;touch-action:manipulation;transition:opacity .1s}
+.cd-btn:active{opacity:.75}
+.cd-btn-primary{background:var(--blue);color:#fff}
+.cd-btn-secondary{background:var(--surf2);color:var(--txt);border:1px solid var(--border2)}
+.cd-btn-danger{background:#3d1212;color:var(--red);border:1px solid #5c1e1e}
+.cd-btn-row{display:flex;gap:10px;margin:0 12px}
+.cd-btn-row .cd-btn{flex:1}
+/* Schedule */
+.cd-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 12px 12px}
+.cd-wday{background:var(--surf);border-radius:10px;padding:8px 2px;text-align:center;border:1px solid transparent}
+.cd-wday.today{border-color:var(--txt3)}
+.cd-wday .wd-l{font-size:9px;color:var(--txt3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.cd-wday .wd-v{font-size:15px;font-weight:700}
+.cd-wday.is-rest .wd-v{color:var(--txt4);font-size:11px;font-weight:400}
+.cd-wday.is-B .wd-v{color:var(--blue)}
+.cd-wday.is-A .wd-v{color:var(--accent)}
+.cd-wday.is-C .wd-v{color:var(--teal)}
+.cd-wday.is-D .wd-v{color:var(--green)}
+.cd-rung-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin:0 12px 10px;padding:16px;border-left:3px solid var(--blue)}
+.cd-rung-card h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.cd-rung-purpose{font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:12px}
+.cd-rung-stats{display:flex;gap:8px}
+.cd-rung-stat{flex:1;background:var(--surf2);border-radius:10px;padding:10px 12px}
+.cd-rung-stat-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.cd-rung-stat-val{font-size:18px;font-weight:700}
+.cd-sbi{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin:0 12px 8px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:manipulation}
+.cd-sbi:active{background:var(--surf2)}
+.cd-sbi-id{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.cd-sbi-info{flex:1}
+.cd-sbi-name{font-size:14px;font-weight:600}
+.cd-sbi-sub{font-size:12px;color:var(--txt3)}
+.cd-pass-row{display:flex;gap:8px;margin-top:10px}
+.cd-pass-pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border2);color:var(--txt3)}
+.cd-pass-pill.pass{border-color:#2d5a2d;color:var(--green);background:#0d2a0d}
+.cd-pass-pill.fail{border-color:#5a2020;color:var(--red);background:#2a0d0d}
+/* Timer idle */
+.cd-workout-pills{display:flex;gap:8px;padding:12px 12px 4px;overflow-x:auto}
+.cd-wpill{padding:8px 18px;border-radius:20px;border:1px solid var(--border2);background:none;color:var(--txt3);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation;transition:all .15s}
+.cd-wpill.active{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+.cd-seg-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.cd-seg-row:last-child{border-bottom:none}
+.cd-seg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cd-seg-time{color:var(--txt3);font-size:11px;min-width:54px;font-variant-numeric:tabular-nums}
+.cd-seg-body{flex:1}
+.cd-seg-lbl{font-weight:600;text-transform:capitalize}
+.cd-seg-specs{font-size:11px;color:var(--txt3)}
+.cd-seg-dur{color:var(--txt3);font-size:11px}
+/* Timer active */
+.cd-timer-wrap{padding:18px 16px 24px}
+.cd-phase-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.cd-countdown{font-size:80px;font-weight:800;letter-spacing:-4px;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:4px}
+.cd-pause-lbl{font-size:13px;color:var(--txt3);margin-bottom:14px;height:18px}
+.cd-speed-incline{display:flex;gap:28px;margin-bottom:18px}
+.cd-si .si-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.cd-si .si-val{font-size:36px;font-weight:700;line-height:1}
+.cd-si .si-unit{font-size:13px;color:var(--txt3)}
+.cd-prog-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:3px}
+.cd-prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.cd-prog-fill{height:100%;border-radius:2px;transition:width .25s linear}
+.cd-next-row{padding:10px 0;border-top:1px solid var(--border);font-size:13px;color:var(--txt3);margin-bottom:14px}
+.cd-next-row strong{color:var(--txt)}
+.cd-ctrl-row{display:flex;gap:10px}
+.cd-ctrl-row .cd-btn{flex:1;padding:15px}
+/* History */
+.cd-stats-row{display:flex;gap:8px;margin:0 12px 10px}
+.cd-stat-box{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+.cd-stat-box .s-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.cd-stat-box .s-val{font-size:20px;font-weight:700}
+.cd-stat-box .s-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+.cd-chart-wrap{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin:0 12px 10px;padding:14px 12px 10px}
+.cd-chart-ttl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.cd-log-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border)}
+.cd-log-item:last-child{border-bottom:none}
+.cd-log-badge{width:36px;height:36px;border-radius:9px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;color:var(--blue)}
+.cd-log-name{font-size:13px;font-weight:600}
+.cd-log-date{font-size:11px;color:var(--txt3)}
+.cd-log-stat{font-size:12px;color:var(--txt3);text-align:right}
+.cd-log-pass{font-size:11px;font-weight:600;text-align:right}
+/* Complete */
+.cd-complete{padding:36px 20px;text-align:center}
+.cd-complete-icon{font-size:52px;margin-bottom:12px}
+.cd-complete-title{font-size:24px;font-weight:700;margin-bottom:6px}
+.cd-complete-sub{color:var(--txt2);font-size:14px;line-height:1.6;margin-bottom:24px}
 </style>
 </head>
 <body>
@@ -373,6 +464,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   </button>
   <button class="tab" id="tab-calis" onclick="switchTab('calis')">
     <span class="tab-icon">🤸</span>Calis
+  </button>
+  <button class="tab" id="tab-cardio" onclick="switchTab('cardio')">
+    <span class="tab-icon">🏃</span>Cardio
   </button>
   <button class="tab" id="tab-abs" onclick="switchTab('abs')">
     <span class="tab-icon">🔥</span>Abs
@@ -410,6 +504,17 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 <!-- Recovery Guide Tab -->
 <div id="view-recovery">
   <div id="recovery-content"></div>
+</div>
+
+<!-- Cardio Tab -->
+<div id="view-cardio" style="display:none;padding:0">
+  <div id="cardio-subnav" class="cd-subnav"></div>
+  <div id="cardio-content"></div>
+</div>
+
+<!-- Cardio Modal -->
+<div id="cardio-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;justify-content:center" onclick="cdModalBgClick(event)">
+  <div id="cardio-modal-sheet" class="modal-sheet"></div>
 </div>
 
 <!-- Plate Calculator Modal -->
@@ -2475,7 +2580,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
 
-  const views = ['workout','calis','abs','recovery','yoga'];
+  const views = ['workout','calis','cardio','abs','yoga','recovery'];
   for (const v of views) {
     const el = document.getElementById(`view-${v}`);
     if (el) {
@@ -2489,6 +2594,7 @@ function switchTab(tab) {
   if (tab === 'calis') renderCalis();
   if (tab === 'abs') renderAbs();
   if (tab === 'yoga') renderYoga();
+  if (tab === 'cardio') initCardioTab();
 }
 
 // ═══════════════════════════════════════════════
@@ -3180,6 +3286,704 @@ function renderAll() {
 
 // ── Init ──
 renderAll();
+
+// ═══════════════════════════════════════════════
+//  CARDIO TAB
+// ═══════════════════════════════════════════════
+
+// ── Workout data ──────────────────────────────
+const CD_WORKOUTS_RAW = [
+  { id:'A', name:'Incline Ladder', family:'A',
+    purpose:'Highest calorie-per-minute walk. Steep segments load glutes, hamstrings, and calves.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.4,incline:3, label:'warmup'},
+      {startMin:5, endMin:9, mph:3.5,incline:6, label:'climb'},
+      {startMin:9, endMin:13,mph:3.4,incline:9, label:'climb'},
+      {startMin:13,endMin:17,mph:3.3,incline:12,label:'climb'},
+      {startMin:17,endMin:20,mph:3.5,incline:4, label:'recovery'},
+      {startMin:20,endMin:24,mph:3.5,incline:7, label:'climb'},
+      {startMin:24,endMin:28,mph:3.4,incline:10,label:'climb'},
+      {startMin:28,endMin:32,mph:3.3,incline:13,label:'climb'},
+      {startMin:32,endMin:35,mph:3.5,incline:4, label:'recovery'},
+      {startMin:35,endMin:39,mph:3.4,incline:11,label:'climb'},
+      {startMin:39,endMin:42,mph:2.8,incline:0, label:'cooldown'},
+    ]},
+  { id:'C', name:'Easy Steady', family:'C',
+    purpose:'Conversational the whole way, heart rate under about 135. Aerobic minutes without taxing the hard days.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.2,incline:1,label:'warmup'},
+      {startMin:5, endMin:15,mph:3.3,incline:2,label:'steady'},
+      {startMin:15,endMin:25,mph:3.3,incline:3,label:'steady'},
+      {startMin:25,endMin:35,mph:3.3,incline:2,label:'steady'},
+      {startMin:35,endMin:38,mph:3.3,incline:1,label:'steady'},
+      {startMin:38,endMin:40,mph:2.8,incline:0,label:'cooldown'},
+    ]},
+  { id:'D', name:'Triple Ascent', family:'D',
+    purpose:'Rotating 8/12/6% loads the legs differently as grade shifts. High intensity, low impact.',
+    segments:[
+      {startMin:0, endMin:3, mph:3.0,incline:0, label:'warmup'},
+      {startMin:3, endMin:8, mph:3.5,incline:8, label:'climb'},
+      {startMin:8, endMin:13,mph:3.0,incline:12,label:'climb'},
+      {startMin:13,endMin:18,mph:3.8,incline:6, label:'recovery'},
+      {startMin:18,endMin:23,mph:3.5,incline:8, label:'climb'},
+      {startMin:23,endMin:28,mph:3.0,incline:12,label:'climb'},
+      {startMin:28,endMin:33,mph:3.8,incline:6, label:'recovery'},
+      {startMin:33,endMin:38,mph:3.5,incline:8, label:'climb'},
+      {startMin:38,endMin:43,mph:3.0,incline:12,label:'climb'},
+      {startMin:43,endMin:48,mph:3.8,incline:6, label:'recovery'},
+      {startMin:48,endMin:50,mph:2.5,incline:0, label:'cooldown'},
+    ]},
+  { id:'B1', name:'Baseline', family:'B',
+    purpose:'6 × 3 min jogs with 3 min walks. Establishes the pattern.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.5,incline:3,label:'warmup'},
+      {startMin:5, endMin:8, mph:4.5,incline:1,label:'jog'},
+      {startMin:8, endMin:11,mph:3.3,incline:3,label:'recovery'},
+      {startMin:11,endMin:14,mph:4.5,incline:1,label:'jog'},
+      {startMin:14,endMin:17,mph:3.3,incline:3,label:'recovery'},
+      {startMin:17,endMin:20,mph:4.5,incline:1,label:'jog'},
+      {startMin:20,endMin:23,mph:3.3,incline:3,label:'recovery'},
+      {startMin:23,endMin:26,mph:4.5,incline:1,label:'jog'},
+      {startMin:26,endMin:29,mph:3.3,incline:3,label:'recovery'},
+      {startMin:29,endMin:32,mph:4.5,incline:1,label:'jog'},
+      {startMin:32,endMin:35,mph:3.3,incline:3,label:'recovery'},
+      {startMin:35,endMin:38,mph:4.5,incline:1,label:'jog'},
+      {startMin:38,endMin:41,mph:3.3,incline:4,label:'recovery'},
+      {startMin:41,endMin:43,mph:2.8,incline:0,label:'cooldown'},
+    ], progression:{advanceWhen:'both-sessions-passed-in-week',nextId:'B2'}},
+  { id:'B2', name:'Mixed 3s and 4s', family:'B',
+    purpose:'Alternating 3 and 4 min jog blocks. Total jog time grows to 21 min.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.5,incline:3,label:'warmup'},
+      {startMin:5, endMin:8, mph:4.5,incline:1,label:'jog'},
+      {startMin:8, endMin:11,mph:3.3,incline:3,label:'recovery'},
+      {startMin:11,endMin:15,mph:4.5,incline:1,label:'jog'},
+      {startMin:15,endMin:18,mph:3.3,incline:3,label:'recovery'},
+      {startMin:18,endMin:21,mph:4.5,incline:1,label:'jog'},
+      {startMin:21,endMin:24,mph:3.3,incline:3,label:'recovery'},
+      {startMin:24,endMin:28,mph:4.5,incline:1,label:'jog'},
+      {startMin:28,endMin:31,mph:3.3,incline:3,label:'recovery'},
+      {startMin:31,endMin:34,mph:4.5,incline:1,label:'jog'},
+      {startMin:34,endMin:37,mph:3.3,incline:3,label:'recovery'},
+      {startMin:37,endMin:41,mph:4.5,incline:1,label:'jog'},
+      {startMin:41,endMin:43,mph:2.8,incline:0,label:'cooldown'},
+    ], progression:{advanceWhen:'both-sessions-passed-in-week',nextId:'B3'}},
+  { id:'B3', name:'All Fours', family:'B',
+    purpose:'5 × 4 min jogs. Adaptation is holding four minutes, not accumulating more.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.5,incline:3,label:'warmup'},
+      {startMin:5, endMin:9, mph:4.5,incline:1,label:'jog'},
+      {startMin:9, endMin:12,mph:3.3,incline:3,label:'recovery'},
+      {startMin:12,endMin:16,mph:4.5,incline:1,label:'jog'},
+      {startMin:16,endMin:19,mph:3.3,incline:3,label:'recovery'},
+      {startMin:19,endMin:23,mph:4.5,incline:1,label:'jog'},
+      {startMin:23,endMin:26,mph:3.3,incline:3,label:'recovery'},
+      {startMin:26,endMin:30,mph:4.5,incline:1,label:'jog'},
+      {startMin:30,endMin:33,mph:3.3,incline:3,label:'recovery'},
+      {startMin:33,endMin:37,mph:4.5,incline:1,label:'jog'},
+      {startMin:37,endMin:40,mph:3.3,incline:3,label:'recovery'},
+      {startMin:40,endMin:43,mph:2.8,incline:0,label:'cooldown'},
+    ], progression:{advanceWhen:'both-sessions-passed-in-week',nextId:'B4'}},
+  { id:'B4', name:'Shorter Recovery', family:'B',
+    purpose:'Same 4 min jogs, walk cut to 2 min. Hardest jump in the ladder.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.5,incline:3,label:'warmup'},
+      {startMin:5, endMin:9, mph:4.5,incline:1,label:'jog'},
+      {startMin:9, endMin:11,mph:3.3,incline:3,label:'recovery'},
+      {startMin:11,endMin:15,mph:4.5,incline:1,label:'jog'},
+      {startMin:15,endMin:17,mph:3.3,incline:3,label:'recovery'},
+      {startMin:17,endMin:21,mph:4.5,incline:1,label:'jog'},
+      {startMin:21,endMin:23,mph:3.3,incline:3,label:'recovery'},
+      {startMin:23,endMin:27,mph:4.5,incline:1,label:'jog'},
+      {startMin:27,endMin:29,mph:3.3,incline:3,label:'recovery'},
+      {startMin:29,endMin:33,mph:4.5,incline:1,label:'jog'},
+      {startMin:33,endMin:35,mph:3.3,incline:3,label:'recovery'},
+      {startMin:35,endMin:39,mph:4.5,incline:1,label:'jog'},
+      {startMin:39,endMin:41,mph:3.3,incline:2,label:'recovery'},
+      {startMin:41,endMin:43,mph:2.8,incline:0,label:'cooldown'},
+    ], progression:{advanceWhen:'both-sessions-passed-in-week',nextId:'B5'}},
+  { id:'B5', name:'Fives', family:'B',
+    purpose:'5 × 5 min jogs. The peak of the current ladder.',
+    segments:[
+      {startMin:0, endMin:5, mph:3.5,incline:3,label:'warmup'},
+      {startMin:5, endMin:10,mph:4.5,incline:1,label:'jog'},
+      {startMin:10,endMin:13,mph:3.3,incline:3,label:'recovery'},
+      {startMin:13,endMin:18,mph:4.5,incline:1,label:'jog'},
+      {startMin:18,endMin:21,mph:3.3,incline:3,label:'recovery'},
+      {startMin:21,endMin:26,mph:4.5,incline:1,label:'jog'},
+      {startMin:26,endMin:29,mph:3.3,incline:3,label:'recovery'},
+      {startMin:29,endMin:34,mph:4.5,incline:1,label:'jog'},
+      {startMin:34,endMin:37,mph:3.3,incline:3,label:'recovery'},
+      {startMin:37,endMin:42,mph:4.5,incline:1,label:'jog'},
+      {startMin:42,endMin:44,mph:2.8,incline:0,label:'cooldown'},
+    ], progression:{advanceWhen:'both-sessions-passed-in-week',nextId:null}},
+];
+
+const CD_WORKOUTS = {};
+CD_WORKOUTS_RAW.forEach(w => {
+  CD_WORKOUTS[w.id] = {
+    ...w,
+    durationMin: w.segments[w.segments.length-1].endMin,
+    jogMinutes:  w.segments.filter(s=>s.label==='jog').reduce((s,x)=>s+x.endMin-x.startMin,0),
+  };
+});
+
+(function validateCD() {
+  Object.values(CD_WORKOUTS).forEach(w => {
+    for (let i=0;i<w.segments.length-1;i++) {
+      if (w.segments[i].endMin !== w.segments[i+1].startMin)
+        throw new Error(`${w.id}: segment gap at index ${i}`);
+    }
+    w.segments.forEach((s,i) => {
+      if (s.label==='jog' && s.incline!==1)
+        throw new Error(`${w.id}[${i}]: jog must be 1% incline`);
+    });
+  });
+})();
+
+// ── State ─────────────────────────────────────
+const CD_STATE_KEY = 'cardio-v1';
+let cardioState = {activeRung:'B1', rungStartDate:new Date().toISOString(), history:[]};
+
+function cardioLoadState() {
+  try { const r=localStorage.getItem(CD_STATE_KEY); if(r) cardioState=JSON.parse(r); } catch {}
+}
+function cardioSaveState() {
+  try { localStorage.setItem(CD_STATE_KEY,JSON.stringify(cardioState)); } catch {}
+}
+cardioLoadState();
+
+// ── Audio ─────────────────────────────────────
+let cdAudioCtx = null;
+function cdEnsureAudio() {
+  if (!cdAudioCtx) cdAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (cdAudioCtx.state==='suspended') cdAudioCtx.resume();
+}
+function cdBeep(freq,dur,vol=0.3) {
+  try {
+    cdEnsureAudio();
+    const o=cdAudioCtx.createOscillator(), g=cdAudioCtx.createGain();
+    o.connect(g); g.connect(cdAudioCtx.destination);
+    o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,cdAudioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,cdAudioCtx.currentTime+dur);
+    o.start(cdAudioCtx.currentTime); o.stop(cdAudioCtx.currentTime+dur+0.05);
+  } catch {}
+}
+function cdTransitionBeep() {
+  cdBeep(880,.12); setTimeout(()=>cdBeep(880,.12),180); setTimeout(()=>cdBeep(1100,.25),360);
+}
+function cdWarningBeep() { cdBeep(660,.15); }
+
+// ── Timer state ───────────────────────────────
+let cdTs = null;
+
+function cdStartWorkout(workoutId) {
+  cdEnsureAudio();
+  const w = CD_WORKOUTS[workoutId];
+  cdTs = {
+    workout:w, segIdx:0,
+    segStartWall:Date.now(), totalStartWall:Date.now(),
+    paused:false, pauseWall:null,
+    segPausedMs:0, totalPausedMs:0,
+    segExtSec:0, lastBeepKey:null,
+    tickId:null, complete:false,
+  };
+  cdTs.tickId = setInterval(cdTimerTick, 200);
+  cdRenderTimerActive();
+}
+
+function cdPause() {
+  if (!cdTs||cdTs.paused||cdTs.complete) return;
+  cdTs.paused=true; cdTs.pauseWall=Date.now();
+  clearInterval(cdTs.tickId); cdTs.tickId=null;
+  cdRenderTimerActive();
+}
+
+function cdResume() {
+  if (!cdTs||!cdTs.paused||cdTs.complete) return;
+  const ms=Date.now()-cdTs.pauseWall;
+  cdTs.segPausedMs+=ms; cdTs.totalPausedMs+=ms;
+  cdTs.paused=false; cdTs.pauseWall=null;
+  cdTs.tickId=setInterval(cdTimerTick,200);
+  cdRenderTimerActive();
+}
+
+function cdStop(confirmed) {
+  if (!cdTs) return;
+  if (!confirmed) {
+    cdShowModal(
+      'Stop workout?',
+      'Progress will not be saved.',
+      [{label:'Keep going',cls:'cd-btn-secondary',fn:'cdCloseModal()'},
+       {label:'Stop',cls:'cd-btn-danger',fn:'cdStopConfirm()'}]
+    );
+    return;
+  }
+  clearInterval(cdTs.tickId); cdTs=null;
+  cdRenderTimerIdle();
+}
+function cdStopConfirm() { cdCloseModal(); cdStop(true); }
+
+function cdSegElapsed() {
+  const now=cdTs.paused?cdTs.pauseWall:Date.now();
+  return (now-cdTs.segStartWall-cdTs.segPausedMs)/1000;
+}
+function cdTotalElapsed() {
+  const now=cdTs.paused?cdTs.pauseWall:Date.now();
+  return (now-cdTs.totalStartWall-cdTs.totalPausedMs)/1000;
+}
+function cdSegDur() {
+  const s=cdTs.workout.segments[cdTs.segIdx];
+  return (s.endMin-s.startMin)*60+cdTs.segExtSec;
+}
+
+function cdTimerTick() {
+  if (!cdTs||cdTs.paused) return;
+  const el=cdSegElapsed(), dur=cdSegDur(), rem=dur-el;
+  const bk=`${cdTs.segIdx}-${cdTs.segExtSec}`;
+  if (rem<=30.5&&rem>29.5&&cdTs.lastBeepKey!==bk+'-30'){cdTs.lastBeepKey=bk+'-30';cdWarningBeep();}
+  if (rem<=10.5&&rem>9.5&&cdTs.lastBeepKey!==bk+'-10'){cdTs.lastBeepKey=bk+'-10';cdWarningBeep();}
+  if (rem<=0) { cdAdvanceSeg(); return; }
+  cdRenderTimerActive();
+}
+
+function cdAdvanceSeg() {
+  const w=cdTs.workout, cur=w.segments[cdTs.segIdx], nextIdx=cdTs.segIdx+1, next=w.segments[nextIdx]||null;
+  cdTransitionBeep();
+  if (!next) { cdFinishWorkout(); return; }
+  if (cur.label==='recovery'&&next.label==='jog'&&w.family==='B') {
+    cdPause(); cdShowHRGate(nextIdx); return;
+  }
+  cdMoveTo(nextIdx);
+}
+
+function cdMoveTo(idx) {
+  cdTs.segIdx=idx; cdTs.segStartWall=Date.now();
+  cdTs.segPausedMs=0; cdTs.segExtSec=0; cdTs.lastBeepKey=null;
+  cdTs.paused=false; cdTs.pauseWall=null;
+  if (!cdTs.tickId) cdTs.tickId=setInterval(cdTimerTick,200);
+  cdRenderTimerActive();
+}
+
+function cdShowHRGate(nextIdx) {
+  document.getElementById('cardio-modal-sheet').innerHTML = `
+    <div class="modal-handle"></div>
+    <div style="text-align:center;font-size:30px;margin-bottom:8px">💓</div>
+    <div class="modal-title">Heart Rate Check</div>
+    <div class="modal-body">Is your heart rate still above 145? Walk another minute before the next jog block.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="cd-btn cd-btn-secondary" onclick="cdContinueFromGate(${nextIdx})">Good to go — start jog</button>
+      <button class="cd-btn cd-btn-primary" onclick="cdExtendRecovery(${nextIdx})">Add 1 min recovery</button>
+    </div>`;
+  document.getElementById('cardio-modal').style.display='flex';
+}
+
+function cdExtendRecovery(nextIdx) {
+  cdCloseModal();
+  cdTs.segExtSec+=60; cdTs.paused=false; cdTs.pauseWall=null;
+  if (!cdTs.tickId) cdTs.tickId=setInterval(cdTimerTick,200);
+  cdRenderTimerActive();
+}
+
+function cdContinueFromGate(nextIdx) { cdCloseModal(); cdMoveTo(nextIdx); }
+
+function cdFinishWorkout() {
+  clearInterval(cdTs.tickId); cdTs.tickId=null; cdTs.complete=true;
+  const totalMin=Math.round(cdTotalElapsed()/60);
+  if (cdTs.workout.family==='B') cdShowPostBQ1(totalMin);
+  else {
+    const log={id:cdUid(),date:new Date().toISOString(),workoutId:cdTs.workout.id,totalMinutes:totalMin,jogMinutes:0};
+    cdSaveLog(log);
+    cdRenderComplete(log,null);
+    cdTs=null;
+  }
+}
+
+function cdShowPostBQ1(totalMin) {
+  document.getElementById('cardio-modal-sheet').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">Workout done! 🎉</div>
+    <div class="modal-body">Did you complete every jog block at full length?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="cd-btn cd-btn-primary" onclick="cdShowPostBQ2(${totalMin},true)">Yes, all blocks</button>
+      <button class="cd-btn cd-btn-secondary" onclick="cdShowPostBQ2(${totalMin},false)">No, cut one short</button>
+    </div>`;
+  document.getElementById('cardio-modal').style.display='flex';
+}
+
+function cdShowPostBQ2(totalMin,allJogs) {
+  document.getElementById('cardio-modal-sheet').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">One more question</div>
+    <div class="modal-body">Was your heart rate back near 130 before each jog block?</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="cd-btn cd-btn-primary" onclick="cdFinishB(${totalMin},${allJogs},'yes')">Yes</button>
+      <button class="cd-btn cd-btn-secondary" onclick="cdFinishB(${totalMin},${allJogs},'mostly')">Mostly</button>
+      <button class="cd-btn cd-btn-secondary" onclick="cdFinishB(${totalMin},${allJogs},'no')">No</button>
+    </div>`;
+}
+
+function cdFinishB(totalMin,allJogs,hrReady) {
+  cdCloseModal();
+  const w=cdTs.workout, passed=allJogs&&hrReady==='yes';
+  const log={id:cdUid(),date:new Date().toISOString(),workoutId:w.id,totalMinutes:totalMin,jogMinutes:w.jogMinutes,completedAllJogs:allJogs,hrReady,passed};
+  cdSaveLog(log);
+  const adv=cdCheckProgression();
+  cdRenderComplete(log,adv);
+  cdTs=null;
+}
+
+// ── Progression ────────────────────────────────
+function cdWeekKey(date) {
+  const d=new Date(date); d.setHours(0,0,0,0);
+  d.setDate(d.getDate()+3-((d.getDay()+6)%7));
+  const w1=new Date(d.getFullYear(),0,4);
+  const wn=1+Math.round(((d-w1)/86400000-3+((w1.getDay()+6)%7))/7);
+  return `${d.getFullYear()}-W${String(wn).padStart(2,'0')}`;
+}
+
+function cdCheckProgression() {
+  const rung=cardioState.activeRung, w=CD_WORKOUTS[rung];
+  if (!w.progression||!w.progression.nextId) return false;
+  const wk=cdWeekKey(new Date());
+  const passed=cardioState.history.filter(l=>l.workoutId===rung&&cdWeekKey(new Date(l.date))===wk&&l.passed);
+  if (passed.length>=2) {
+    cardioState.activeRung=w.progression.nextId;
+    cardioState.rungStartDate=new Date().toISOString();
+    cardioSaveState();
+    return w.progression.nextId;
+  }
+  return false;
+}
+
+function cdWeeksOnRung() {
+  if (!cardioState.rungStartDate) return 1;
+  return Math.max(1,Math.ceil((Date.now()-new Date(cardioState.rungStartDate).getTime())/(7*864e5)));
+}
+
+function cdPassesThisWeek() {
+  const wk=cdWeekKey(new Date());
+  return cardioState.history.filter(l=>l.workoutId===cardioState.activeRung&&cdWeekKey(new Date(l.date))===wk&&l.passed).length;
+}
+
+function cdSessionsThisWeek() {
+  const wk=cdWeekKey(new Date());
+  return cardioState.history.filter(l=>cdWeekKey(new Date(l.date))===wk).length;
+}
+
+// ── Logging ────────────────────────────────────
+function cdSaveLog(log) {
+  cardioState.history.unshift(log);
+  if (cardioState.history.length>500) cardioState.history.pop();
+  cardioSaveState();
+}
+
+function cdWeeklyJogData() {
+  const weeks={};
+  cardioState.history.forEach(l=>{
+    const wk=cdWeekKey(new Date(l.date));
+    if (!weeks[wk]) weeks[wk]={total:0,sessions:0};
+    weeks[wk].total+=(l.jogMinutes||0);
+    weeks[wk].sessions++;
+  });
+  return Object.keys(weeks).sort().slice(-8).map(wk=>({week:wk,jogMin:weeks[wk].total,sessions:weeks[wk].sessions}));
+}
+
+// ── Modal ──────────────────────────────────────
+function cdShowModal(title,body,buttons) {
+  const btns=buttons.map(b=>`<button class="cd-btn ${b.cls}" onclick="${b.fn}">${b.label}</button>`).join('');
+  document.getElementById('cardio-modal-sheet').innerHTML=`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${title}</div>
+    <div class="modal-body">${body}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">${btns}</div>`;
+  document.getElementById('cardio-modal').style.display='flex';
+}
+function cdCloseModal() { document.getElementById('cardio-modal').style.display='none'; }
+function cdModalBgClick(e) { if(e.target===document.getElementById('cardio-modal')) cdCloseModal(); }
+
+// ── Helpers ────────────────────────────────────
+function cdUid() { return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function cdFmtSec(sec) {
+  sec=Math.max(0,Math.ceil(sec));
+  return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+}
+function cdFmtMin(min) { return min>=60?`${Math.floor(min/60)}h ${min%60}m`:`${min} min`; }
+function cdFmtDate(iso) { return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
+
+const CD_LABEL_COLOR = {warmup:'var(--purple)',jog:'var(--blue)',recovery:'var(--green)',climb:'var(--accent)',cooldown:'var(--txt3)',steady:'var(--teal)'};
+function cdLabelColor(lbl) { return CD_LABEL_COLOR[lbl]||'var(--txt3)'; }
+function cdLabelBg(lbl) {
+  const m={warmup:'rgba(167,139,250,.12)',jog:'rgba(91,155,213,.12)',recovery:'rgba(74,222,128,.12)',climb:'rgba(232,160,32,.12)',cooldown:'rgba(100,116,139,.1)',steady:'rgba(52,211,153,.12)'};
+  return m[lbl]||'rgba(100,116,139,.1)';
+}
+
+// ── Sub-tab system ─────────────────────────────
+let currentCardioTab = 'schedule';
+let cdSelectedWorkout = null;
+
+function initCardioTab() {
+  if (!cdSelectedWorkout) cdSelectedWorkout = cardioState.activeRung;
+  cdRenderSubnav();
+  switchCardioTab(currentCardioTab);
+}
+
+function cdRenderSubnav() {
+  document.getElementById('cardio-subnav').innerHTML =
+    ['schedule','timer','history'].map(t=>`
+      <button class="cd-subnav-btn${currentCardioTab===t?' active':''}" onclick="switchCardioTab('${t}')">
+        ${t.charAt(0).toUpperCase()+t.slice(1)}
+      </button>`).join('');
+}
+
+function switchCardioTab(tab) {
+  currentCardioTab = tab;
+  cdRenderSubnav();
+  if (tab==='schedule') cdRenderSchedule();
+  else if (tab==='timer') { if(cdTs) cdRenderTimerActive(); else cdRenderTimerIdle(); }
+  else if (tab==='history') cdRenderHistory();
+}
+
+// ── Schedule ───────────────────────────────────
+const CD_SCHEDULE = ['B','A','C',null,'B','D',null];
+const CD_DAY_LBLS = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+function cdTodayIdx() { const d=new Date().getDay(); return d===0?6:d-1; }
+
+function cdRenderSchedule() {
+  const todayIdx=cdTodayIdx();
+  const rung=CD_WORKOUTS[cardioState.activeRung];
+  const weeks=cdWeeksOnRung(), passes=cdPassesThisWeek();
+  const thisWeek=cdWeekKey(new Date());
+
+  const cells=CD_SCHEDULE.map((s,i)=>{
+    const isToday=i===todayIdx;
+    const wid=s==='B'?cardioState.activeRung:s;
+    const val=wid||(s===null?'—':'—');
+    const cls=s?`is-${s}`:'is-rest';
+    return `<div class="cd-wday ${cls}${isToday?' today':''}">
+      <div class="wd-l">${CD_DAY_LBLS[i]}</div>
+      <div class="wd-v">${val||'—'}</div>
+    </div>`;
+  }).join('');
+
+  const todaySession=CD_SCHEDULE[todayIdx];
+  let todayHtml='';
+  if (todaySession) {
+    const wid=todaySession==='B'?cardioState.activeRung:todaySession;
+    const w=CD_WORKOUTS[wid];
+    todayHtml=`<div class="cd-section-lbl">Today</div>
+      <div class="cd-sbi" onclick="cdStartFromSchedule('${wid}')">
+        <div class="cd-sbi-id" style="background:${cdLabelBg(w.family==='B'?'jog':w.family==='A'?'climb':w.family==='C'?'steady':'recovery')};color:${cdLabelColor(w.family==='B'?'jog':w.family==='A'?'climb':w.family==='C'?'steady':'recovery')}">${wid}</div>
+        <div class="cd-sbi-info">
+          <div class="cd-sbi-name">${w.name}</div>
+          <div class="cd-sbi-sub">${cdFmtMin(w.durationMin)}${w.jogMinutes>0?` · ${w.jogMinutes} min jog`:' · walk only'}</div>
+        </div>
+        <span style="color:var(--txt3)">›</span>
+      </div>`;
+  } else {
+    todayHtml=`<div class="cd-section-lbl">Today</div>
+      <div style="padding:6px 16px 12px;color:var(--txt3);font-size:14px">Rest day.</div>`;
+  }
+
+  const nextRung=rung.progression?.nextId;
+  const advMsg=passes>=2?`<span style="color:var(--green)">Advanced this week ✓</span>`:`${passes}/2 passes this week`;
+  const recentB=cardioState.history.filter(l=>l.workoutId===cardioState.activeRung&&cdWeekKey(new Date(l.date))===thisWeek).slice(0,2);
+  const passRows=recentB.length?`<div class="cd-pass-row">${recentB.map(l=>`<span class="cd-pass-pill ${l.passed?'pass':'fail'}">${cdFmtDate(l.date)} ${l.passed?'Pass ✓':'Repeat'}</span>`).join('')}</div>`:'';
+
+  document.getElementById('cardio-content').innerHTML=`
+    <div class="cd-section-lbl">This week</div>
+    <div class="cd-week-grid">${cells}</div>
+    ${todayHtml}
+    <div class="cd-section-lbl">B Progression</div>
+    <div class="cd-rung-card">
+      <h3>${cardioState.activeRung} · ${rung.name}</h3>
+      <div class="cd-rung-purpose">${rung.purpose}</div>
+      <div class="cd-rung-stats">
+        <div class="cd-rung-stat">
+          <div class="cd-rung-stat-lbl">Jog</div>
+          <div class="cd-rung-stat-val" style="color:var(--blue)">${rung.jogMinutes}<span style="font-size:12px;color:var(--txt3)"> min</span></div>
+        </div>
+        <div class="cd-rung-stat">
+          <div class="cd-rung-stat-lbl">Week ${weeks}</div>
+          <div class="cd-rung-stat-val" style="font-size:13px;padding-top:4px">${advMsg}</div>
+        </div>
+        <div class="cd-rung-stat">
+          <div class="cd-rung-stat-lbl">Next</div>
+          <div class="cd-rung-stat-val" style="color:var(--txt3)">${nextRung||'—'}</div>
+        </div>
+      </div>
+      ${passRows}
+    </div>`;
+}
+
+function cdStartFromSchedule(wid) {
+  cdSelectedWorkout=wid;
+  switchCardioTab('timer');
+}
+
+// ── Timer idle ─────────────────────────────────
+function cdRenderTimerIdle() {
+  if (cdTs) { cdRenderTimerActive(); return; }
+  if (!cdSelectedWorkout) cdSelectedWorkout=cardioState.activeRung;
+
+  const pills=['A','B','C','D'].map(f=>{
+    const wid=f==='B'?cardioState.activeRung:f;
+    const active=cdSelectedWorkout===wid;
+    const lbl=f==='B'?cardioState.activeRung:f;
+    return `<button class="cd-wpill${active?' active':''}" onclick="cdSelectWorkout('${wid}')">${lbl}</button>`;
+  }).join('');
+
+  const w=CD_WORKOUTS[cdSelectedWorkout]||CD_WORKOUTS[cardioState.activeRung];
+  const rows=w.segments.map(s=>`
+    <div class="cd-seg-row">
+      <div class="cd-seg-dot" style="background:${cdLabelColor(s.label)}"></div>
+      <div class="cd-seg-time">${s.startMin}:00–${s.endMin}:00</div>
+      <div class="cd-seg-body">
+        <div class="cd-seg-lbl" style="color:${cdLabelColor(s.label)}">${s.label}</div>
+        <div class="cd-seg-specs">${s.mph} mph · ${s.incline}%</div>
+      </div>
+      <div class="cd-seg-dur">${s.endMin-s.startMin}m</div>
+    </div>`).join('');
+
+  document.getElementById('cardio-content').innerHTML=`
+    <div class="cd-workout-pills">${pills}</div>
+    <div style="padding:4px 16px 10px">
+      <div style="font-size:19px;font-weight:700;margin-bottom:2px">${w.name}</div>
+      <div style="font-size:13px;color:var(--txt2)">${cdFmtMin(w.durationMin)}${w.jogMinutes>0?` · ${w.jogMinutes} min jogging`:' · walk only'}</div>
+      <div style="font-size:12px;color:var(--txt3);margin-top:3px">${w.purpose}</div>
+    </div>
+    <div class="cd-card" style="margin-bottom:10px">${rows}</div>
+    <div style="padding:0 12px 16px">
+      <button class="cd-btn cd-btn-primary" onclick="cdStartWorkout('${w.id}')">Start ${w.id}</button>
+    </div>`;
+}
+
+function cdSelectWorkout(wid) { cdSelectedWorkout=wid; cdRenderTimerIdle(); }
+
+// ── Timer active ───────────────────────────────
+function cdRenderTimerActive() {
+  if (!cdTs) { cdRenderTimerIdle(); return; }
+  const w=cdTs.workout, seg=w.segments[cdTs.segIdx], next=w.segments[cdTs.segIdx+1]||null;
+  const el=cdSegElapsed(), dur=cdSegDur(), rem=Math.max(0,dur-el);
+  const totEl=cdTotalElapsed(), totDur=w.durationMin*60;
+  const segPct=Math.min(100,(el/dur)*100), totPct=Math.min(100,(totEl/totDur)*100);
+  const color=cdLabelColor(seg.label), bg=cdLabelBg(seg.label);
+  const nextHtml=next
+    ?`<div class="cd-next-row">Next: <strong style="color:${cdLabelColor(next.label)}">${next.label}</strong> · ${next.mph} mph · ${next.incline}%${cdTs.segExtSec>0?' <span style="color:var(--green)">(+1 min)</span>':''}</div>`
+    :`<div class="cd-next-row" style="color:var(--green)">Last segment — almost done!</div>`;
+
+  document.getElementById('cardio-content').innerHTML=`
+    <div class="cd-timer-wrap">
+      <div class="cd-phase-badge" style="background:${bg};color:${color}">${seg.label}</div>
+      <div class="cd-countdown" style="color:${color}">${cdFmtSec(rem)}</div>
+      <div class="cd-pause-lbl">${cdTs.paused?'PAUSED':''}</div>
+      <div class="cd-speed-incline">
+        <div class="cd-si"><div class="si-lbl">Speed</div><div class="si-val">${seg.mph}<span class="si-unit"> mph</span></div></div>
+        <div class="cd-si"><div class="si-lbl">Incline</div><div class="si-val">${seg.incline}<span class="si-unit"> %</span></div></div>
+        <div class="cd-si"><div class="si-lbl">Segment</div><div class="si-val" style="font-size:22px;padding-top:8px">${cdTs.segIdx+1}<span class="si-unit">/${w.segments.length}</span></div></div>
+      </div>
+      <div class="cd-prog-lbl"><span>${seg.label}</span><span>${cdFmtSec(el)} / ${cdFmtSec(dur)}</span></div>
+      <div class="cd-prog-bar"><div class="cd-prog-fill" style="width:${segPct}%;background:${color}"></div></div>
+      <div class="cd-prog-lbl"><span>Total</span><span>${cdFmtSec(totEl)} / ${cdFmtSec(totDur)}</span></div>
+      <div class="cd-prog-bar"><div class="cd-prog-fill" style="width:${totPct}%;background:var(--txt3)"></div></div>
+      ${nextHtml}
+      <div class="cd-ctrl-row">
+        ${cdTs.paused
+          ?`<button class="cd-btn cd-btn-primary" onclick="cdResume()">Resume</button>`
+          :`<button class="cd-btn cd-btn-secondary" onclick="cdPause()">Pause</button>`}
+        <button class="cd-btn cd-btn-danger" onclick="cdStop(false)">Stop</button>
+      </div>
+    </div>`;
+}
+
+
+// ── Complete screen ────────────────────────────
+function cdRenderComplete(log,advancedTo) {
+  const w=CD_WORKOUTS[log.workoutId];
+  let statsHtml=`<strong>${log.totalMinutes} min</strong> completed`;
+  if (log.jogMinutes>0) statsHtml+=` · <strong>${log.jogMinutes} min</strong> jogging`;
+  let advHtml='';
+  if (advancedTo) {
+    advHtml=`<div style="margin:12px 0;padding:12px;background:#0d2a0d;border-radius:10px;border:1px solid #2d5a2d;color:var(--green);font-size:14px;font-weight:600">🎉 Advanced to ${advancedTo}!</div>`;
+  } else if (log.passed===false) {
+    advHtml=`<div style="margin-top:10px;font-size:13px;color:var(--txt3)">Repeating ${log.workoutId} next session — that's the normal path.</div>`;
+  }
+  document.getElementById('cardio-content').innerHTML=`
+    <div class="cd-complete">
+      <div class="cd-complete-icon">🏃</div>
+      <div class="cd-complete-title">${w.name}</div>
+      <div class="cd-complete-sub">${statsHtml}</div>
+      ${advHtml}
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">
+        <button class="cd-btn cd-btn-primary" onclick="switchCardioTab('history')">View history</button>
+        <button class="cd-btn cd-btn-secondary" onclick="cdRenderTimerIdle()">Back to workouts</button>
+      </div>
+    </div>`;
+}
+
+// ── History ────────────────────────────────────
+function cdRenderHistory() {
+  const weekData=cdWeeklyJogData();
+  const rung=CD_WORKOUTS[cardioState.activeRung];
+
+  let chartHtml='<div style="color:var(--txt3);font-size:13px;padding:6px 0">No sessions yet.</div>';
+  if (weekData.length>0) {
+    const maxJog=Math.max(...weekData.map(d=>d.jogMin),1);
+    const W=300,H=80,n=weekData.length,barW=Math.floor((W-(n-1)*5)/n);
+    const thisWk=cdWeekKey(new Date());
+    const bars=weekData.map((d,i)=>{
+      const x=i*(barW+5), bh=Math.max(2,(d.jogMin/maxJog)*H), y=H-bh;
+      const isNow=d.week===thisWk, col=isNow?'var(--blue)':'var(--border2)';
+      return `<rect x="${x}" y="${y}" width="${barW}" height="${bh}" rx="2" fill="${col}"/>
+        ${d.jogMin>0?`<text x="${x+barW/2}" y="${y-3}" text-anchor="middle" font-size="9" fill="${isNow?'var(--blue)':'var(--txt3)'}">${d.jogMin}</text>`:''}
+        <text x="${x+barW/2}" y="${H+13}" text-anchor="middle" font-size="8" fill="var(--txt4)">${d.week.slice(-2)}</text>`;
+    }).join('');
+    chartHtml=`<svg viewBox="-2 0 ${W+4} ${H+18}" width="100%" style="overflow:visible">${bars}</svg>`;
+  }
+
+  const logItems=cardioState.history.slice(0,20).map(l=>{
+    const w=CD_WORKOUTS[l.workoutId]||{name:l.workoutId};
+    const passHtml=l.passed!==undefined?`<div class="cd-log-pass" style="color:${l.passed?'var(--green)':'var(--txt3)'}">${l.passed?'Pass ✓':'Repeat'}</div>`:'';
+    return `<div class="cd-log-item">
+      <div class="cd-log-badge">${l.workoutId}</div>
+      <div style="flex:1"><div class="cd-log-name">${w.name||l.workoutId}</div><div class="cd-log-date">${cdFmtDate(l.date)}</div></div>
+      <div><div class="cd-log-stat">${l.totalMinutes}m${l.jogMinutes>0?` · ${l.jogMinutes}j`:''}</div>${passHtml}</div>
+    </div>`;
+  }).join('')||'<div style="padding:20px;text-align:center;color:var(--txt3);font-size:13px">No sessions yet.</div>';
+
+  document.getElementById('cardio-content').innerHTML=`
+    <div style="height:8px"></div>
+    <div class="cd-stats-row">
+      <div class="cd-stat-box">
+        <div class="s-lbl">Rung</div>
+        <div class="s-val" style="color:var(--blue)">${cardioState.activeRung}</div>
+        <div class="s-sub">${rung.name}</div>
+      </div>
+      <div class="cd-stat-box">
+        <div class="s-lbl">Passes</div>
+        <div class="s-val">${cdPassesThisWeek()}/2</div>
+        <div class="s-sub">this week</div>
+      </div>
+      <div class="cd-stat-box">
+        <div class="s-lbl">Sessions</div>
+        <div class="s-val">${cdSessionsThisWeek()}/5</div>
+        <div class="s-sub">this week</div>
+      </div>
+    </div>
+    <div class="cd-chart-wrap">
+      <div class="cd-chart-ttl">Jog minutes per week</div>
+      ${chartHtml}
+    </div>
+    <div class="cd-section-lbl">Recent sessions</div>
+    <div class="cd-card">${logItems}</div>
+    <div style="height:8px"></div>`;
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if (!document.hidden&&cdTs&&currentCardioTab==='timer'&&currentTab==='cardio') cdRenderTimerActive();
+});
 
 // Re-open previously open sessions
 if (state.openSessions) {
