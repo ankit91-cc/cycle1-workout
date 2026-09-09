@@ -64,7 +64,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .view.active{display:block}
 #view-history{display:none;padding:12px}
 #view-history.active{display:block}
-#view-recovery{display:none;padding:12px}
+#view-recovery{display:none;padding:12px;padding-top:calc(12px + env(safe-area-inset-top,0px))}
 #view-recovery.active{display:block}
 
 /* ── Week goals banner ── */
@@ -375,6 +375,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 
 /* ── Cardio tab ── */
 .cd-subnav{display:flex;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding-top:env(safe-area-inset-top,0px);
   border-bottom:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);
   position:sticky;top:0;z-index:50}
 .cd-subnav-btn{flex:1;padding:10px 0;background:none;border:none;color:var(--txt3);font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s;touch-action:manipulation}
@@ -541,6 +542,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 @keyframes swFromL{from{transform:translateX(-26px);opacity:.35}to{transform:none;opacity:1}}
 .sw-l{animation:swFromR .22s cubic-bezier(.32,.72,0,1)}
 .sw-r{animation:swFromL .22s cubic-bezier(.32,.72,0,1)}
+
+/* Tabs without the header have to clear the status bar / Dynamic Island
+   themselves, since #header is the only thing that carries the top inset. */
+.tabview{padding:12px;padding-top:calc(12px + env(safe-area-inset-top,0px))}
 </style>
 </head>
 <body>
@@ -595,17 +600,17 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- Calisthenics Tab -->
-<div id="view-calis" style="display:none;padding:12px">
+<div id="view-calis" class="tabview" style="display:none">
   <div id="calis-content"></div>
 </div>
 
 <!-- Abs Tab -->
-<div id="view-abs" style="display:none;padding:12px">
+<div id="view-abs" class="tabview" style="display:none">
   <div id="abs-content"></div>
 </div>
 
 <!-- Yoga Tab -->
-<div id="view-yoga" style="display:none;padding:12px">
+<div id="view-yoga" class="tabview" style="display:none">
   <div id="yoga-content"></div>
 </div>
 
@@ -4541,6 +4546,9 @@ function cdRenderHistory() {
 // ═══════════════════════════════════════════════
 const SWIPE_TABS = ['workout','calis','cardio','abs','yoga'];
 const CD_TABS = ['schedule','timer','history'];
+// Animate the inner content, never a container holding a sticky element.
+const SWIPE_ANIM_EL = {workout:'view-workout', calis:'calis-content',
+                       cardio:'cardio-content', abs:'abs-content', yoga:'yoga-content'};
 // Short flick = move within this tab. Long flick = move between tabs.
 const SWIPE_SHORT_MIN = 55;
 function swipeLongMin() { return Math.max(150, window.innerWidth * 0.45); }
@@ -4600,9 +4608,10 @@ document.addEventListener('touchend', e => {
 function swipeTab(dir) {
   const i = SWIPE_TABS.indexOf(currentTab), next = i + dir;
   if (next < 0 || next >= SWIPE_TABS.length) return;           // no wrap at the ends
-  switchTab(SWIPE_TABS[next]);
+  const tab = SWIPE_TABS[next];
+  switchTab(tab);
   window.scrollTo(0, 0);
-  slideIn(document.getElementById('view-' + SWIPE_TABS[next]), dir);
+  slideIn(document.getElementById(SWIPE_ANIM_EL[tab] || ('view-' + tab)), dir);
 }
 
 // ── Short: within the current tab ──
