@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cycle 1">
@@ -15,13 +15,24 @@
   --accent:#e8a020;--accent-dim:#7a4800;
   --blue:#5b9bd5;--purple:#a78bfa;--green:#4ade80;--red:#f87171;--teal:#34d399;
   --txt:#f0f0f0;--txt2:#aaa;--txt3:#666;--txt4:#444;
-  --check:26px;--radius:12px;
+  --check:26px;
+  /* Concentric radii - nested corners derive from their parent */
+  --radius:16px;--r-md:12px;--r-sm:8px;
+  /* Liquid Glass. Per the HIG this is a CONTROL-layer material: it belongs on
+     bars, headers and floating controls, never on content cards, and is never
+     stacked glass-on-glass. */
+  --glass:rgba(26,26,26,.68);
+  --glass-brd:rgba(255,255,255,.10);
+  --glass-hi:rgba(255,255,255,.16);
+  --blur:saturate(180%) blur(24px);
 }
 html{background:var(--bg)}
 body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;font-size:15px;min-height:100vh;padding-bottom:80px;overscroll-behavior:none}
 
 /* ── Header ── */
-#header{background:var(--surf);padding:12px 16px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+#header{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid var(--glass-brd);
+  position:sticky;top:0;z-index:100;box-shadow:inset 0 1px 0 var(--glass-hi)}
 .h-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .h-cycle{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:600}
 .h-phase{font-size:11px;color:var(--txt3)}
@@ -39,7 +50,10 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .dot.transition{background:var(--purple)}
 
 /* ── Tabs ── */
-#tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
+#tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--glass);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-top:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);
+  display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;color:var(--txt3);background:none;border:none;font-size:10px;text-transform:uppercase;letter-spacing:.08em;gap:3px;touch-action:manipulation;position:relative}
 .tab.active{color:var(--accent)}
 .tab.active::before{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--accent);border-radius:0 0 2px 2px}
@@ -164,7 +178,7 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 /* ── Set Notes (per item) ── */
 .set-note-area{padding:2px 0 8px 38px;border-bottom:1px solid #1c1c1c}
 .tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
-.set-tag{font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid var(--border2);background:var(--surf2);color:var(--txt3);cursor:pointer;touch-action:manipulation}
+.set-tag{font-size:13px;min-height:44px;padding:3px 16px;border-radius:22px;border:1px solid var(--border2);background:var(--surf2);color:var(--txt3);cursor:pointer;touch-action:manipulation}
 .set-tag.easy{background:#0d1f0d;border-color:#2d5a2d;color:#4ade80}
 .set-tag.good{background:#0d1525;border-color:#1e3d5c;color:#5b9bd5}
 .set-tag.tough{background:#1f1400;border-color:#5c3d00;color:#e8a020}
@@ -177,12 +191,19 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .ci-tag-badge.good{background:#0d1525;color:#5b9bd5}
 .ci-tag-badge.tough{background:#1f1400;color:#e8a020}
 .ci-tag-badge.failed{background:#1f0d0d;color:#f87171}
-.ci-expand-note{color:var(--txt4);font-size:12px;margin-left:4px;cursor:pointer;touch-action:manipulation}
+.ci-expand-note{flex-shrink:0;align-self:center;width:44px;height:44px;min-width:44px;
+  display:flex;align-items:center;justify-content:center;background:none;border:none;
+  border-radius:var(--r-sm);color:var(--txt4);font-size:15px;cursor:pointer;touch-action:manipulation;
+  opacity:.32;transition:opacity .15s}
+.ci-expand-note:active{background:var(--surf2);opacity:1}
 
 /* ── Plate Calculator Modal ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:82vh;overflow-y:auto}
+.modal-sheet{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-top:1px solid var(--glass-hi);border-radius:22px 22px 0 0;
+  padding:20px 20px calc(36px + env(safe-area-inset-bottom,0px));
+  width:100%;max-width:440px;max-height:82vh;overflow-y:auto}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px}
 .plate-input-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -208,14 +229,17 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .modal-close-row button{background:var(--surf2);border:1px solid var(--border2);color:var(--txt2);border-radius:10px;padding:10px 24px;font-size:14px;cursor:pointer}
 
 /* ── Rest Timer ── */
-.rest-timer{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom,0px));left:0;right:0;background:var(--surf);border-top:1px solid var(--border);padding:9px 14px 9px 16px;z-index:150;display:none;align-items:center;gap:10px}
+.rest-timer{position:fixed;bottom:calc(56px + env(safe-area-inset-bottom,0px));left:0;right:0;
+  background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-top:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);
+  padding:9px 14px 9px 16px;z-index:150;display:none;align-items:center;gap:10px}
 .rest-timer.visible{display:flex}
 .rt-left{flex-shrink:0}
 .rt-label{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px}
 .rt-time{font-size:34px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.5px}
 .rt-time.done{color:var(--green)}
 .rt-presets{display:flex;gap:5px}
-.rt-preset{background:var(--surf2);border:1px solid var(--border2);border-radius:7px;padding:5px 9px;font-size:12px;color:var(--txt2);cursor:pointer;touch-action:manipulation}
+.rt-preset{background:var(--surf2);border:1px solid var(--border2);border-radius:var(--r-sm);min-height:34px;padding:5px 13px;font-size:13px;color:var(--txt2);cursor:pointer;touch-action:manipulation}
 .rt-preset.sel{border-color:var(--accent);color:var(--accent)}
 .rt-preset:active{opacity:.7}
 .rt-btn{background:var(--accent-dim);border:1px solid var(--accent);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;touch-action:manipulation;flex-shrink:0}
@@ -319,12 +343,15 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 /* ── Warmup Quick Complete ── */
 .sec-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-top:2px}
 .sec-hd-row .sec-title{margin-bottom:0;padding-top:0}
-.wu-all-btn{font-size:11px;background:var(--surf2);border:1px solid var(--border2);color:var(--green);border-radius:6px;padding:3px 8px;cursor:pointer;touch-action:manipulation;font-weight:600}
+.wu-all-btn{font-size:13px;min-height:44px;background:var(--surf2);border:1px solid var(--border2);color:var(--green);border-radius:var(--r-sm);padding:3px 14px;cursor:pointer;touch-action:manipulation;font-weight:600}
 .wu-all-btn:active{opacity:.7}
 .wu-all-btn.done-all{color:var(--txt3);border-color:var(--border);background:none}
 
 /* ── Weight Edit Modal ── */
-.weight-edit-sheet{background:var(--surf);border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:440px;max-height:70vh;overflow-y:auto}
+.weight-edit-sheet{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-top:1px solid var(--glass-hi);border-radius:22px 22px 0 0;
+  padding:20px 20px calc(36px + env(safe-area-inset-bottom,0px));
+  width:100%;max-width:440px;max-height:70vh;overflow-y:auto}
 .weight-edit-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .weight-edit-row:last-of-type{border-bottom:none}
 .weight-edit-label{font-size:13px;color:var(--txt2);width:65px;flex-shrink:0}
@@ -347,7 +374,9 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .wt-cancel-btn{background:var(--surf2);color:var(--txt2);border:1px solid var(--border2);border-radius:10px;padding:10px;font-size:14px;width:100%;cursor:pointer;margin-top:8px;touch-action:manipulation}
 
 /* ── Cardio tab ── */
-.cd-subnav{display:flex;background:var(--surf);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.cd-subnav{display:flex;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--glass-brd);box-shadow:inset 0 1px 0 var(--glass-hi);
+  position:sticky;top:0;z-index:50}
 .cd-subnav-btn{flex:1;padding:10px 0;background:none;border:none;color:var(--txt3);font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s;touch-action:manipulation}
 .cd-subnav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
 #cardio-content{padding:12px 0 80px}
@@ -445,6 +474,19 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .cd-complete-icon{font-size:52px;margin-bottom:12px}
 .cd-complete-title{font-size:24px;font-weight:700;margin-bottom:6px}
 .cd-complete-sub{color:var(--txt2);font-size:14px;line-height:1.6;margin-bottom:24px}
+
+/* HIG: honour the system accessibility settings. Reduce Transparency drops the
+   glass for opaque surfaces; Reduce Motion drops animation. Legibility mid-set
+   must never depend on the material. */
+@media (prefers-reduced-transparency: reduce) {
+  #header,#tabbar,.rest-timer,.cd-subnav,.modal-sheet,.weight-edit-sheet{
+    background:var(--surf);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .modal-overlay{background:rgba(0,0,0,.86);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
@@ -2252,11 +2294,11 @@ function renderSection(sessionId, sec, sectionIdx) {
       <div class="ci-box">${done ? '✓' : ''}</div>
       <div class="ci-body">
         <div class="ci-text">${displayText}
-          <span class="ci-expand-note" onclick="event.stopPropagation();expandSetNote('${sessionId}','${item.id}',this)" title="Add note">💬</span>
         </div>
         ${item.note ? `<div class="ci-note">${item.note}</div>` : ''}
         <div id="${badgeId}">${sn.tag ? `<span class="ci-tag-badge ${sn.tag}">${sn.tag}</span>` : ''}</div>
       </div>
+      <button class="ci-expand-note" onclick="event.stopPropagation();expandSetNote('${sessionId}','${item.id}',this)" aria-label="Add a note for this set">💬</button>
     </div>`;
     // If note area already expanded, show it
     if (sn.tag || sn.text) {
