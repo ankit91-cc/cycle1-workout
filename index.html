@@ -401,21 +401,30 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .cd-seg-specs{font-size:11px;color:var(--txt3)}
 .cd-seg-dur{color:var(--txt3);font-size:11px}
 /* Timer active */
-.cd-timer-wrap{padding:18px 16px 24px}
-.cd-phase-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
-.cd-countdown{font-size:80px;font-weight:800;letter-spacing:-4px;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:4px}
-.cd-pause-lbl{font-size:13px;color:var(--txt3);margin-bottom:14px;height:18px}
-.cd-speed-incline{display:flex;gap:28px;margin-bottom:18px}
-.cd-si .si-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
-.cd-si .si-val{font-size:36px;font-weight:700;line-height:1}
-.cd-si .si-unit{font-size:13px;color:var(--txt3)}
-.cd-prog-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:3px}
-.cd-prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
-.cd-prog-fill{height:100%;border-radius:2px;transition:width .25s linear}
-.cd-next-row{padding:10px 0;border-top:1px solid var(--border);font-size:13px;color:var(--txt3);margin-bottom:14px}
+.cd-timer-wrap{padding:26px 16px 30px}
+.cd-phase-badge{display:inline-block;padding:7px 16px;border-radius:20px;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.cd-countdown{font-size:clamp(96px,30vw,132px);font-weight:800;letter-spacing:-5px;line-height:.95;font-variant-numeric:tabular-nums;margin-bottom:8px}
+.cd-pause-lbl{font-size:16px;color:var(--txt3);margin-bottom:20px;height:22px}
+.cd-speed-incline{display:flex;gap:34px;margin-bottom:26px}
+.cd-si .si-lbl{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:600}
+.cd-si .si-val{font-size:56px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.cd-si .si-unit{font-size:17px;color:var(--txt3)}
+.cd-prog-lbl{display:flex;justify-content:space-between;font-size:14px;color:var(--txt3);margin-bottom:5px;font-variant-numeric:tabular-nums}
+.cd-prog-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.cd-prog-fill{height:100%;border-radius:4px;transition:width .25s linear}
+.cd-next-row{padding:16px 0;border-top:1px solid var(--border);font-size:18px;color:var(--txt3);margin-bottom:18px}
 .cd-next-row strong{color:var(--txt)}
 .cd-ctrl-row{display:flex;gap:10px}
-.cd-ctrl-row .cd-btn{flex:1;padding:15px}
+.cd-ctrl-row .cd-btn{flex:1;padding:20px;font-size:19px}
+/* Post-workout distance + time entry */
+.cd-log-field{display:flex;align-items:center;gap:10px;margin:16px 0}
+.cd-log-flbl{font-size:13px;color:var(--txt2);width:70px;flex-shrink:0;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.cd-log-stepper{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.cd-log-step{width:48px;height:48px;border-radius:10px;background:var(--surf2);border:1px solid var(--border2);color:var(--txt);font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation;flex-shrink:0}
+.cd-log-step:active{background:var(--surf3)}
+.cd-log-input{flex:1;min-width:0;background:var(--surf2);border:1px solid var(--border2);border-radius:10px;color:var(--txt);font-size:30px;font-weight:700;text-align:center;padding:9px 4px;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.cd-log-input::-webkit-outer-spin-button,.cd-log-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.cd-log-unit{font-size:12px;color:var(--txt3);width:50px;flex-shrink:0}
 /* History */
 .cd-stats-row{display:flex;gap:8px;margin:0 12px 10px}
 .cd-stat-box{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
@@ -3648,12 +3657,7 @@ function cdFinishWorkout() {
   releaseWakeLock();
   const totalMin=Math.round(cdTotalElapsed()/60);
   if (cdTs.workout.family==='B') cdShowPostBQ1(totalMin);
-  else {
-    const log={id:cdUid(),date:new Date().toISOString(),workoutId:cdTs.workout.id,totalMinutes:totalMin,jogMinutes:0};
-    cdSaveLog(log);
-    cdRenderComplete(log,null);
-    cdTs=null;
-  }
+  else cdAskDistance(totalMin,null,null);
 }
 
 function cdShowPostBQ1(totalMin) {
@@ -3681,13 +3685,84 @@ function cdShowPostBQ2(totalMin,allJogs) {
 }
 
 function cdFinishB(totalMin,allJogs,hrReady) {
+  cdAskDistance(totalMin,allJogs,hrReady);
+}
+
+// ── Post-workout distance + time entry ─────────
+// Read off the treadmill before stepping away. Time is pre-filled with the
+// actual elapsed clock, so an unchanged walk is one tap.
+let _cdPending = null;
+
+function cdAskDistance(totalMin, allJogs, hrReady) {
+  _cdPending = {totalMin, allJogs, hrReady};
+  document.getElementById('cardio-modal-sheet').innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">Log this walk</div>
+    <div class="modal-body">Read these off the treadmill before you step off.</div>
+    <div class="cd-log-field">
+      <div class="cd-log-flbl">Distance</div>
+      <div class="cd-log-stepper">
+        <button class="cd-log-step" onclick="cdStepDist(-0.1)">−</button>
+        <input class="cd-log-input" id="cd-dist" type="number" inputmode="decimal" step="0.01" min="0" value="0.00" onfocus="this.select()" />
+        <button class="cd-log-step" onclick="cdStepDist(0.1)">+</button>
+      </div>
+      <div class="cd-log-unit">miles</div>
+    </div>
+    <div class="cd-log-field">
+      <div class="cd-log-flbl">Time</div>
+      <div class="cd-log-stepper">
+        <button class="cd-log-step" onclick="cdStepMin(-1)">−</button>
+        <input class="cd-log-input" id="cd-mins" type="number" inputmode="numeric" step="1" min="0" value="${totalMin}" onfocus="this.select()" />
+        <button class="cd-log-step" onclick="cdStepMin(1)">+</button>
+      </div>
+      <div class="cd-log-unit">minutes</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+      <button class="cd-btn cd-btn-primary" onclick="cdCommitLog(false)">Save</button>
+      <button class="cd-btn cd-btn-secondary" onclick="cdCommitLog(true)">Skip</button>
+    </div>`;
+  document.getElementById('cardio-modal').style.display='flex';
+}
+
+function cdStepDist(d) {
+  const el=document.getElementById('cd-dist'); if(!el) return;
+  const v=Math.max(0,Math.round(((parseFloat(el.value)||0)+d)*100)/100);
+  el.value=v.toFixed(2);
+}
+function cdStepMin(d) {
+  const el=document.getElementById('cd-mins'); if(!el) return;
+  el.value=Math.max(0,(parseInt(el.value)||0)+d);
+}
+function cdPace(mins,dist) {
+  if(!dist||dist<=0||!mins||mins<=0) return null;
+  const per=mins/dist, m=Math.floor(per), sec=Math.round((per-m)*60);
+  return sec===60?`${m+1}:00`:`${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function cdCommitLog(skip) {
+  const p=_cdPending||{totalMin:0,allJogs:null,hrReady:null};
+  const w=cdTs?cdTs.workout:null;
+  let dist=0, mins=p.totalMin;
+  if(!skip){
+    const de=document.getElementById('cd-dist'), me=document.getElementById('cd-mins');
+    const d=de?parseFloat(de.value):NaN, m=me?parseInt(me.value):NaN;
+    if(!isNaN(d)&&d>0) dist=Math.round(d*100)/100;
+    if(!isNaN(m)&&m>0) mins=m;
+  }
   cdCloseModal();
-  const w=cdTs.workout, passed=allJogs&&hrReady==='yes';
-  const log={id:cdUid(),date:new Date().toISOString(),workoutId:w.id,totalMinutes:totalMin,jogMinutes:w.jogMinutes,completedAllJogs:allJogs,hrReady,passed};
+  if(!w){ _cdPending=null; return; }
+  const isB = w.family==='B';
+  const log={id:cdUid(),date:new Date().toISOString(),workoutId:w.id,
+             totalMinutes:mins, jogMinutes:isB?w.jogMinutes:0, distanceMi:dist};
+  if(isB){
+    log.completedAllJogs=p.allJogs;
+    log.hrReady=p.hrReady;
+    log.passed=!!(p.allJogs&&p.hrReady==='yes');
+  }
   cdSaveLog(log);
-  const adv=cdCheckProgression();
+  const adv = isB ? cdCheckProgression() : false;
   cdRenderComplete(log,adv);
-  cdTs=null;
+  cdTs=null; _cdPending=null;
 }
 
 // ── Progression ────────────────────────────────
@@ -3960,6 +4035,11 @@ function cdRenderComplete(log,advancedTo) {
   const w=CD_WORKOUTS[log.workoutId];
   let statsHtml=`<strong>${log.totalMinutes} min</strong> completed`;
   if (log.jogMinutes>0) statsHtml+=` · <strong>${log.jogMinutes} min</strong> jogging`;
+  if (log.distanceMi>0) {
+    statsHtml+=` · <strong>${log.distanceMi.toFixed(2)} mi</strong>`;
+    const pc=cdPace(log.totalMinutes,log.distanceMi);
+    if (pc) statsHtml+=` · ${pc} /mi`;
+  }
   let advHtml='';
   if (advancedTo) {
     advHtml=`<div style="margin:12px 0;padding:12px;background:#0d2a0d;border-radius:10px;border:1px solid #2d5a2d;color:var(--green);font-size:14px;font-weight:600">🎉 Advanced to ${advancedTo}!</div>`;
@@ -4005,7 +4085,7 @@ function cdRenderHistory() {
     return `<div class="cd-log-item">
       <div class="cd-log-badge">${l.workoutId}</div>
       <div style="flex:1"><div class="cd-log-name">${w.name||l.workoutId}</div><div class="cd-log-date">${cdFmtDate(l.date)}</div></div>
-      <div><div class="cd-log-stat">${l.totalMinutes}m${l.jogMinutes>0?` · ${l.jogMinutes}j`:''}</div>${passHtml}</div>
+      <div><div class="cd-log-stat">${l.totalMinutes}m${l.distanceMi>0?` · ${l.distanceMi.toFixed(2)}mi`:''}${l.jogMinutes>0?` · ${l.jogMinutes}j`:''}</div>${passHtml}</div>
     </div>`;
   }).join('')||'<div style="padding:20px;text-align:center;color:var(--txt3);font-size:13px">No sessions yet.</div>';
 
