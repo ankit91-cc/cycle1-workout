@@ -535,6 +535,12 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 .bk-nudge-t{font-size:16px;font-weight:700;margin-bottom:3px}
 .bk-nudge-b{font-size:13px;color:var(--txt2);line-height:1.5}
 .bk-nudge-a{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* Swipe between tabs */
+@keyframes swFromR{from{transform:translateX(26px);opacity:.35}to{transform:none;opacity:1}}
+@keyframes swFromL{from{transform:translateX(-26px);opacity:.35}to{transform:none;opacity:1}}
+.sw-l{animation:swFromR .22s cubic-bezier(.32,.72,0,1)}
+.sw-r{animation:swFromL .22s cubic-bezier(.32,.72,0,1)}
 </style>
 </head>
 <body>
@@ -4512,6 +4518,72 @@ function cdRenderHistory() {
     <div class="cd-section-lbl">Recent sessions</div>
     <div class="cd-card">${logItems}</div>
     <div style="height:8px"></div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  SWIPE BETWEEN TABS
+//  A horizontal flick moves one tab left or right. It yields to anything
+//  that has a better claim on the gesture: vertical scrolling, a pinch,
+//  a text field, a sideways-scrolling container, an open sheet, or a
+//  cardio session that is actually running.
+// ═══════════════════════════════════════════════
+const SWIPE_TABS = ['workout','calis','cardio','abs','yoga'];
+let _swX = 0, _swY = 0, _swT = 0, _swOn = false;
+
+function swipeBlocked(target) {
+  if (!SWIPE_TABS.includes(currentTab)) return true;           // e.g. the Recovery guide
+  if (document.querySelector('.modal-overlay.open')) return true;
+  const cm = document.getElementById('cardio-modal');
+  if (cm && cm.style.display === 'flex') return true;
+  // Don't let a stray thumb pull you off a running walk.
+  if (currentTab === 'cardio' && cdTs && !cdTs.paused && !cdTs.complete) return true;
+  for (let el = target; el && el !== document.body; el = el.parentElement) {
+    const tag = el.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (el.scrollWidth > el.clientWidth + 4) {
+      const ox = getComputedStyle(el).overflowX;
+      if (ox === 'auto' || ox === 'scroll') return true;        // that container owns it
+    }
+  }
+  return false;
+}
+
+document.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1 || swipeBlocked(e.target)) { _swOn = false; return; }
+  _swOn = true;
+  _swX = e.touches[0].clientX;
+  _swY = e.touches[0].clientY;
+  _swT = Date.now();
+}, {passive:true});
+
+document.addEventListener('touchmove', e => {
+  if (_swOn && e.touches.length > 1) _swOn = false;             // became a pinch
+}, {passive:true});
+
+document.addEventListener('touchend', e => {
+  if (!_swOn) return;
+  _swOn = false;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - _swX, dy = t.clientY - _swY;
+  if (Date.now() - _swT > 600) return;                          // a drag, not a flick
+  if (Math.abs(dx) < 60) return;                                // too short to mean it
+  if (Math.abs(dx) < Math.abs(dy) * 1.6) return;                // mostly vertical
+  const i = SWIPE_TABS.indexOf(currentTab);
+  const next = i + (dx < 0 ? 1 : -1);
+  if (next < 0 || next >= SWIPE_TABS.length) return;            // no wrap at the ends
+  swipeToTab(SWIPE_TABS[next], dx < 0 ? 1 : -1);
+}, {passive:true});
+
+function swipeToTab(tab, dir) {
+  switchTab(tab);
+  window.scrollTo(0, 0);
+  const el = document.getElementById('view-' + tab);
+  if (!el) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.classList.remove('sw-l','sw-r');
+  void el.offsetWidth;                                          // restart the animation
+  el.classList.add(dir > 0 ? 'sw-l' : 'sw-r');
+  setTimeout(() => el.classList.remove('sw-l','sw-r'), 260);
 }
 
 takeSnapshot();  // after the whole script has evaluated
