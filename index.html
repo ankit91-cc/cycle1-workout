@@ -2458,6 +2458,7 @@ function toggleSession(sessionId) {
   if (card) {
     card.classList.toggle('open', !!state.openSessions[sessionId]);
   }
+  syncWakeLock();
 }
 
 function toggleItem(sessionId, itemId) {
@@ -2710,6 +2711,7 @@ function switchTab(tab) {
   if (tab === 'abs') renderAbs();
   if (tab === 'yoga') renderYoga();
   if (tab === 'cardio') initCardioTab();
+  syncWakeLock();
 }
 
 // ═══════════════════════════════════════════════
@@ -2918,9 +2920,19 @@ async function acquireWakeLock() {
 function releaseWakeLock() {
   try { if (_wakeLock) { _wakeLock.release(); _wakeLock = null; } } catch (e) {}
 }
-function timersActive() {
+// The screen should stay on for as long as a workout is underway - not just
+// while a rest timer happens to be counting. An expanded session card means
+// you are mid-session, so the lock is held until you collapse it, leave, or
+// the app goes to the background.
+function wakeLockWanted() {
+  if (document.hidden) return false;
   if (_rtRunning) return true;
-  return !!(typeof cdTs !== 'undefined' && cdTs && !cdTs.paused && !cdTs.complete);
+  if (typeof cdTs !== 'undefined' && cdTs && !cdTs.paused && !cdTs.complete) return true;
+  if (document.querySelector('.session-card.open')) return true;
+  return false;
+}
+function syncWakeLock() {
+  if (wakeLockWanted()) acquireWakeLock(); else releaseWakeLock();
 }
 
 // ── Rest timer — wall-clock, so a locked screen can't stall it ──
@@ -2937,7 +2949,7 @@ function rtFinish() {
   const btn = document.getElementById('rt-playbtn'); if (btn) btn.textContent = '▶';
   const disp = document.getElementById('rt-display'); if (disp) disp.classList.add('done');
   restDoneCue();
-  releaseWakeLock();
+  syncWakeLock();
 }
 function rtTick() {
   rtRecompute();
@@ -2975,7 +2987,7 @@ function toggleRestTimer() {
     if (_rtInterval) { clearInterval(_rtInterval); _rtInterval = null; }
     _rtRunning = false; _rtEndWall = null;
     document.getElementById('rt-playbtn').textContent = '▶';
-    releaseWakeLock();
+    syncWakeLock();
   } else {
     if (_rtRemaining <= 0) _rtRemaining = _rtSecs;
     cdEnsureAudio();  // this tap is the gesture that unlocks audio on iOS
@@ -3003,8 +3015,8 @@ function showRestTimer() {
 function hideRestTimer() {
   if (_rtInterval) { clearInterval(_rtInterval); _rtInterval = null; }
   _rtRunning = false; _rtEndWall = null;
-  releaseWakeLock();
   document.getElementById('rest-timer').classList.remove('visible');
+  syncWakeLock();
 }
 
 // ═══════════════════════════════════════════════
@@ -3960,7 +3972,7 @@ function cdStartWorkout(workoutId) {
 function cdPause() {
   if (!cdTs||cdTs.paused||cdTs.complete) return;
   cdTs.paused=true; cdTs.pauseWall=Date.now();
-  releaseWakeLock();
+  syncWakeLock();
   clearInterval(cdTs.tickId); cdTs.tickId=null;
   cdRenderTimerActive();
 }
@@ -3987,7 +3999,7 @@ function cdStop(confirmed) {
     return;
   }
   clearInterval(cdTs.tickId); cdTs=null;
-  releaseWakeLock();
+  syncWakeLock();
   cdRenderTimerIdle();
 }
 function cdStopConfirm() { cdCloseModal(); cdStop(true); }
@@ -4057,7 +4069,7 @@ function cdContinueFromGate(nextIdx) { cdCloseModal(); cdMoveTo(nextIdx); }
 
 function cdFinishWorkout() {
   clearInterval(cdTs.tickId); cdTs.tickId=null; cdTs.complete=true;
-  releaseWakeLock();
+  syncWakeLock();
   const totalMin=Math.round(cdTotalElapsed()/60);
   if (cdTs.workout.family==='B') cdShowPostBQ1(totalMin);
   else cdAskDistance(totalMin,null,null);
@@ -4528,60 +4540,98 @@ function cdRenderHistory() {
 //  cardio session that is actually running.
 // ═══════════════════════════════════════════════
 const SWIPE_TABS = ['workout','calis','cardio','abs','yoga'];
-let _swX = 0, _swY = 0, _swT = 0, _swOn = false;
+const CD_TABS = ['schedule','timer','history'];
+// Short flick = move within this tab. Long flick = move between tabs.
+const SWIPE_SHORT_MIN = 55;
+function swipeLongMin() { return Math.max(150, window.innerWidth * 0.45); }
 
-function swipeBlocked(target) {
-  if (!SWIPE_TABS.includes(currentTab)) return true;           // e.g. the Recovery guide
-  if (document.querySelector('.modal-overlay.open')) return true;
+let _swX = 0, _swY = 0, _swT = 0, _swOn = false, _swAllow = null;
+
+// Which tiers this gesture may fire, decided where the finger lands.
+function swipeAllowance(target) {
+  const NONE = {short:false, long:false};
+  if (!SWIPE_TABS.includes(currentTab)) return NONE;          // e.g. the Recovery guide
+  if (document.querySelector('.modal-overlay.open')) return NONE;
   const cm = document.getElementById('cardio-modal');
-  if (cm && cm.style.display === 'flex') return true;
-  // Don't let a stray thumb pull you off a running walk.
-  if (currentTab === 'cardio' && cdTs && !cdTs.paused && !cdTs.complete) return true;
+  if (cm && cm.style.display === 'flex') return NONE;
   for (let el = target; el && el !== document.body; el = el.parentElement) {
     const tag = el.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return NONE;
     if (el.scrollWidth > el.clientWidth + 4) {
       const ox = getComputedStyle(el).overflowX;
-      if (ox === 'auto' || ox === 'scroll') return true;        // that container owns it
+      if (ox === 'auto' || ox === 'scroll') return NONE;      // that container owns it
     }
   }
-  return false;
+  // Mid-walk you can still move between Schedule, Timer and History,
+  // but a stray thumb cannot pull you out of Cardio altogether.
+  if (currentTab === 'cardio' && cdTs && !cdTs.paused && !cdTs.complete)
+    return {short:true, long:false};
+  return {short:true, long:true};
 }
 
 document.addEventListener('touchstart', e => {
-  if (e.touches.length !== 1 || swipeBlocked(e.target)) { _swOn = false; return; }
-  _swOn = true;
+  if (e.touches.length !== 1) { _swOn = false; return; }
+  const allow = swipeAllowance(e.target);
+  if (!allow.short && !allow.long) { _swOn = false; return; }
+  _swOn = true; _swAllow = allow;
   _swX = e.touches[0].clientX;
   _swY = e.touches[0].clientY;
   _swT = Date.now();
 }, {passive:true});
 
 document.addEventListener('touchmove', e => {
-  if (_swOn && e.touches.length > 1) _swOn = false;             // became a pinch
+  if (_swOn && e.touches.length > 1) _swOn = false;            // became a pinch
 }, {passive:true});
 
 document.addEventListener('touchend', e => {
   if (!_swOn) return;
   _swOn = false;
   const t = e.changedTouches[0];
-  const dx = t.clientX - _swX, dy = t.clientY - _swY;
-  if (Date.now() - _swT > 600) return;                          // a drag, not a flick
-  if (Math.abs(dx) < 60) return;                                // too short to mean it
-  if (Math.abs(dx) < Math.abs(dy) * 1.6) return;                // mostly vertical
-  const i = SWIPE_TABS.indexOf(currentTab);
-  const next = i + (dx < 0 ? 1 : -1);
-  if (next < 0 || next >= SWIPE_TABS.length) return;            // no wrap at the ends
-  swipeToTab(SWIPE_TABS[next], dx < 0 ? 1 : -1);
+  const dx = t.clientX - _swX, dy = t.clientY - _swY, adx = Math.abs(dx);
+  if (Date.now() - _swT > 600) return;                         // a drag, not a flick
+  if (adx < SWIPE_SHORT_MIN) return;                           // too short to mean it
+  if (adx < Math.abs(dy) * 1.6) return;                        // mostly vertical
+  const dir = dx < 0 ? 1 : -1;
+  if (adx >= swipeLongMin()) { if (_swAllow.long) swipeTab(dir); }
+  else if (_swAllow.short) swipeWithinTab(dir);
 }, {passive:true});
 
-function swipeToTab(tab, dir) {
-  switchTab(tab);
+// ── Long: between tabs ──
+function swipeTab(dir) {
+  const i = SWIPE_TABS.indexOf(currentTab), next = i + dir;
+  if (next < 0 || next >= SWIPE_TABS.length) return;           // no wrap at the ends
+  switchTab(SWIPE_TABS[next]);
   window.scrollTo(0, 0);
-  const el = document.getElementById('view-' + tab);
+  slideIn(document.getElementById('view-' + SWIPE_TABS[next]), dir);
+}
+
+// ── Short: within the current tab ──
+function swipeWithinTab(dir) {
+  if (currentTab === 'workout') {
+    const n = (state.currentWeek || 0) + dir;
+    if (n < 0 || n >= WEEKS.length) return;
+    changeWeek(dir);
+    slideIn(document.getElementById('view-workout'), dir);
+  } else if (currentTab === 'calis') {
+    const days = CALIS_DAYS.map(d => d.num);
+    const i = days.indexOf(state.calisSelectedDay || 1), n = i + dir;
+    if (i < 0 || n < 0 || n >= days.length) return;
+    calSelectDay(days[n]);
+    slideIn(document.getElementById('calis-content'), dir);
+  } else if (currentTab === 'cardio') {
+    const i = CD_TABS.indexOf(currentCardioTab), n = i + dir;
+    if (i < 0 || n < 0 || n >= CD_TABS.length) return;
+    switchCardioTab(CD_TABS[n]);
+    slideIn(document.getElementById('cardio-content'), dir);
+  }
+  // Abs and Yoga have no inner axis, so a short flick does nothing there.
+}
+
+function slideIn(el, dir) {
   if (!el) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   el.classList.remove('sw-l','sw-r');
-  void el.offsetWidth;                                          // restart the animation
+  void el.offsetWidth;                                         // restart the animation
   el.classList.add(dir > 0 ? 'sw-l' : 'sw-r');
   setTimeout(() => el.classList.remove('sw-l','sw-r'), 260);
 }
@@ -4592,7 +4642,7 @@ document.addEventListener('visibilitychange',()=>{
   if (document.hidden) return;
   if (cdTs&&currentCardioTab==='timer'&&currentTab==='cardio') cdRenderTimerActive();
   // iOS drops the wake lock whenever the page is hidden — take it back.
-  if (timersActive()) acquireWakeLock();
+  syncWakeLock();
   // A rest timer may have run out while the screen was off. Catch it up.
   if (_rtRunning) { rtRecompute(); updateTimerDisplay(); if (_rtRemaining <= 0) rtFinish(); }
 });
@@ -4607,6 +4657,7 @@ if (state.openSessions) {
     }
   }
 }
+syncWakeLock();
 </script>
 </body>
 </html>
