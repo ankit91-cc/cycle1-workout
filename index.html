@@ -487,6 +487,28 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
     transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+
+/* Time-off card — content layer, so no glass */
+.gap-card{background:linear-gradient(180deg,#1c1508,#161208);border:1px solid var(--accent-dim);
+  border-radius:var(--radius);padding:14px 16px 12px;margin-bottom:10px}
+.gap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.gap-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700}
+.gap-x{background:none;border:none;color:var(--txt3);font-size:22px;line-height:1;
+  width:44px;height:44px;margin:-12px -12px 0 0;cursor:pointer;touch-action:manipulation}
+.gap-title{font-size:19px;font-weight:700;margin:2px 0 5px;letter-spacing:-.01em}
+.gap-line{font-size:14px;color:var(--txt2);line-height:1.5}
+.gap-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.gap-btn{flex:1;min-width:140px;min-height:44px;border-radius:var(--r-md);padding:10px 14px;
+  font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;
+  background:var(--surf2);border:1px solid var(--border2);color:var(--txt)}
+.gap-btn-primary{background:var(--accent);border-color:var(--accent);color:#1a1200}
+.gap-btn:active{opacity:.75}
+.gap-foot{font-size:12px;color:var(--txt3);margin-top:11px;font-style:italic}
+.rec-quiet-link{display:block;width:100%;background:none;border:none;color:var(--txt3);
+  font-size:13px;padding:18px 0 8px;text-align:center;cursor:pointer;touch-action:manipulation;
+  text-decoration:underline;text-underline-offset:3px}
+.rec-back{background:none;border:none;color:var(--accent);font-size:15px;min-height:44px;
+  padding:0 0 6px;cursor:pointer;touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -525,16 +547,15 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   <button class="tab" id="tab-yoga" onclick="switchTab('yoga')">
     <span class="tab-icon">🧘</span>Yoga
   </button>
-  <button class="tab" id="tab-recovery" onclick="switchTab('recovery')">
-    <span class="tab-icon">🔄</span>Recovery
-  </button>
 </div>
 
 <!-- Workout Tab -->
 <div class="view active" id="view-workout">
+  <div id="gap-slot"></div>
   <div id="today-banner-slot"></div>
   <div id="week-goals"></div>
   <div id="sessions-container"></div>
+  <button class="rec-quiet-link" onclick="openRecovery(null)">Coming back after time off? Read the guide</button>
 </div>
 
 <!-- Calisthenics Tab -->
@@ -2541,6 +2562,7 @@ function clearHistory() {
 // ═══════════════════════════════════════════════
 function renderRecovery() {
   const html = `
+  <button class="rec-back" onclick="switchTab('workout')">&lsaquo; Back to workout</button>
   <div class="rec-important">
     <div class="rec-imp-title">The Single Most Important Rule</div>
     <div class="rec-imp-text">
@@ -2550,7 +2572,7 @@ function renderRecovery() {
     </div>
   </div>
 
-  <div class="rec-section">
+  <div class="rec-section" id="rec-w1">
     <div class="rec-h">If You Miss 1 Week</div>
     <div class="rec-block">
       <div class="rec-block-title">When you return:</div>
@@ -2562,7 +2584,7 @@ function renderRecovery() {
     <div class="rec-outcome">✓ One missed week = no strength loss</div>
   </div>
 
-  <div class="rec-section">
+  <div class="rec-section" id="rec-w2">
     <div class="rec-h">If You Miss 2 Weeks</div>
     <div class="rec-block">
       <div class="rec-block-title">Most common scenario. How to restart:</div>
@@ -2579,7 +2601,7 @@ function renderRecovery() {
     <div class="rec-outcome">✓ Strength usually returns in 1–2 sessions</div>
   </div>
 
-  <div class="rec-section">
+  <div class="rec-section" id="rec-w34">
     <div class="rec-h">If You Miss 3–4 Weeks</div>
     <div class="rec-block">
       <div class="rec-block-title">Treat it as a mini reset, not a failure:</div>
@@ -2590,7 +2612,7 @@ function renderRecovery() {
     <div class="rec-outcome">✓ You are reloading a system that already exists — not starting over</div>
   </div>
 
-  <div class="rec-section">
+  <div class="rec-section" id="rec-cycle">
     <div class="rec-h">If You Miss a Full Cycle</div>
     <div class="rec-block">
       <div class="rec-block-title">Do this exact sequence:</div>
@@ -2629,7 +2651,8 @@ let currentTab = 'workout';
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
+  const _tb = document.getElementById(`tab-${tab}`);
+  if (_tb) _tb.classList.add('active');  // Recovery has no tab button
 
   const views = ['workout','calis','cardio','abs','yoga','recovery'];
   for (const v of views) {
@@ -2721,7 +2744,7 @@ const LIFT_KEY_MAP = [
   {key:'press',    re:/overhead press/i},
 ];
 
-function openWeightModal(weekIdx) {
+function openWeightModal(weekIdx, preset) {
   _weEditIdx = weekIdx;
   _weApplyFuture = false;
   const wts = getWeekWeights(weekIdx);
@@ -2729,10 +2752,12 @@ function openWeightModal(weekIdx) {
   document.getElementById('we-week-num').textContent = WEEKS[weekIdx].num;
   const af = document.getElementById('af-toggle');
   af.classList.remove('on');
+  // A gap-driven reduction should carry through the rest of the cycle.
+  if (preset) { _weApplyFuture = true; af.classList.add('on'); }
   let html = '';
   for (const k of LIFT_KEYS) {
     if (defaults && defaults[k] !== undefined) {
-      const val = wts ? wts[k] : defaults[k];
+      const val = (preset && preset[k] !== undefined) ? preset[k] : (wts ? wts[k] : defaults[k]);
       html += `<div class="weight-edit-row">
         <div class="weight-edit-label">${LIFT_LABELS[k]}</div>
         <div class="weight-stepper">
@@ -3373,11 +3398,100 @@ function renderLiftChart(history) {
 // ═══════════════════════════════════════════════
 //  FULL RENDER
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  TIME-OFF DETECTION
+//  Your Recovery guide is a decision tree keyed to how long you have been
+//  away. The app already stamps every tick, so it can work out which branch
+//  applies and surface only that one.
+// ═══════════════════════════════════════════════
+function lastActivityMs() {
+  let last = 0;
+  try { for (const h of loadHistory()) {
+    const t = Date.parse(h.updatedAt || h.date || ''); if (t > last) last = t;
+  } } catch (e) {}
+  try { for (const l of (cardioState.history || [])) {
+    const t = Date.parse(l.date || ''); if (t > last) last = t;
+  } } catch (e) {}
+  return last;
+}
+function gapDays() {
+  const last = lastActivityMs();
+  if (!last) return 0;
+  return Math.floor((Date.now() - last) / 864e5);
+}
+// Branches and reductions come straight from the guide's own wording.
+function gapPlan(d) {
+  if (d < 7)  return null;
+  if (d < 14) return {key:'w1',    sec:'rec-w1',    title:'One week off', pct:0,
+    line:'Repeat the last completed week at the same weights. Do not make it up.'};
+  if (d < 28) return {key:'w2',    sec:'rec-w2',    title:'Two weeks off', pct:6,
+    line:'Reduce working weights 5-7%, keep the structure, run one week at the reduced load.'};
+  if (d < 63) return {key:'w34',   sec:'rec-w34',   title:'Three to four weeks off', pct:null, toWeek1:true,
+    line:'Restart the cycle at Week 1 weights. Keep volume conservative, reps crisp.'};
+  return       {key:'cycle', sec:'rec-cycle', title:'A full cycle off', pct:10,
+    line:'One re-entry week - 2 light lifting days, 1 easy calisthenics day - then restart at about 90% of prior weights.'};
+}
+function renderGapCard() {
+  const slot = document.getElementById('gap-slot');
+  if (!slot) return;
+  const d = gapDays(), plan = gapPlan(d);
+  const last = lastActivityMs();
+  if (!plan || state.gapDismissed === last) { slot.innerHTML = ''; return; }
+  const canAdjust = plan.toWeek1 || (plan.pct > 0);
+  slot.innerHTML = `
+    <div class="gap-card">
+      <div class="gap-head">
+        <div class="gap-eyebrow">Away ${d} days</div>
+        <button class="gap-x" onclick="dismissGap()" aria-label="Dismiss">&times;</button>
+      </div>
+      <div class="gap-title">${plan.title}</div>
+      <div class="gap-line">${plan.line}</div>
+      <div class="gap-actions">
+        ${canAdjust ? `<button class="gap-btn gap-btn-primary" onclick="gapAdjustWeights()">Adjust my weights</button>` : ''}
+        <button class="gap-btn" onclick="openRecovery('${plan.sec}')">Read this section</button>
+      </div>
+      <div class="gap-foot">Never punish yourself with volume. You already built the base.</div>
+    </div>`;
+}
+function dismissGap() {
+  state.gapDismissed = lastActivityMs();
+  saveState(state);
+  renderGapCard();
+}
+// Opens the guide, scrolled to the branch that applies. null = from the top.
+function openRecovery(sectionId) {
+  switchTab('recovery');
+  window.scrollTo(0, 0);
+  if (sectionId) setTimeout(() => {
+    const el = document.getElementById(sectionId);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 60);
+}
+// Pre-fills the weight editor with the reduction the guide prescribes for this
+// gap, with apply-to-future on. Nothing is saved until you press Save.
+function gapAdjustWeights() {
+  const plan = gapPlan(gapDays());
+  if (!plan) return;
+  const wi = state.currentWeek || 0;
+  const cur = getWeekWeights(wi);
+  if (!cur) { openWeightModal(wi); return; }
+  const preset = {};
+  if (plan.toWeek1) {
+    const w1 = WEEKS[0].weights || {};
+    for (const k of LIFT_KEYS) if (w1[k] !== undefined) preset[k] = w1[k];
+  } else {
+    for (const k of LIFT_KEYS) if (cur[k] !== undefined)
+      preset[k] = Math.max(45, Math.round(cur[k] * (1 - plan.pct/100) / 5) * 5);
+  }
+  openWeightModal(wi, preset);
+}
+
 function renderAll() {
   renderHeader();
   renderGoals();
   renderSessions();
   renderTodayBanner();
+  renderGapCard();
 }
 
 // ── Init ──
