@@ -509,6 +509,32 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
   text-decoration:underline;text-underline-offset:3px}
 .rec-back{background:none;border:none;color:var(--accent);font-size:15px;min-height:44px;
   padding:0 0 6px;cursor:pointer;touch-action:manipulation}
+
+/* Backup */
+.wk-foot{display:flex;flex-direction:column;gap:2px;padding-bottom:6px}
+.bk-rows{margin:0 0 14px}
+.bk-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--txt2)}
+.bk-row b{color:var(--txt);font-weight:600;text-align:right}
+.bk-btn{display:block;width:100%;min-height:48px;margin-bottom:8px;border-radius:var(--r-md);
+  padding:13px;font-size:16px;font-weight:600;cursor:pointer;touch-action:manipulation;
+  background:var(--surf2);border:1px solid var(--border2);color:var(--txt)}
+.bk-btn-primary{background:var(--accent);border-color:var(--accent);color:#1a1200}
+.bk-btn-danger{background:#3d1212;border-color:#5c1e1e;color:#f87171}
+.bk-btn:active{opacity:.75}
+.bk-sec{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);margin:18px 0 8px;font-weight:600}
+.bk-snap{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;min-height:48px;
+  background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;
+  margin-bottom:6px;font-size:13px;color:var(--txt2);cursor:pointer;touch-action:manipulation;text-align:left}
+.bk-snap-a{color:var(--accent);font-weight:600;flex-shrink:0}
+.bk-empty{font-size:13px;color:var(--txt3);padding:10px 0}
+.bk-note{font-size:12px;color:var(--txt3);margin-top:14px;line-height:1.5}
+.bk-warn{background:#2a1206;border:1px solid #5c2e1e;border-radius:var(--r-md);padding:12px 14px;margin-bottom:14px}
+.bk-warn-t{font-size:15px;font-weight:700;color:#f8a871;margin-bottom:3px}
+.bk-warn-b{font-size:13px;color:var(--txt2);line-height:1.5}
+.bk-nudge{background:var(--surf);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.bk-nudge-t{font-size:16px;font-weight:700;margin-bottom:3px}
+.bk-nudge-b{font-size:13px;color:var(--txt2);line-height:1.5}
+.bk-nudge-a{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -552,10 +578,14 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 <!-- Workout Tab -->
 <div class="view active" id="view-workout">
   <div id="gap-slot"></div>
+  <div id="backup-nudge-slot"></div>
   <div id="today-banner-slot"></div>
   <div id="week-goals"></div>
   <div id="sessions-container"></div>
-  <button class="rec-quiet-link" onclick="openRecovery(null)">Coming back after time off? Read the guide</button>
+  <div class="wk-foot">
+    <button class="rec-quiet-link" onclick="openRecovery(null)">Coming back after time off? Read the guide</button>
+    <button class="rec-quiet-link" onclick="openDataModal()">Data &amp; backup</button>
+  </div>
 </div>
 
 <!-- Calisthenics Tab -->
@@ -588,6 +618,17 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSys
 <div id="cardio-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;justify-content:center" onclick="cdModalBgClick(event)">
   <div id="cardio-modal-sheet" class="modal-sheet"></div>
 </div>
+
+<!-- Data & Backup Modal -->
+<div class="modal-overlay" id="data-modal" onclick="closeDataModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Data &amp; Backup</div>
+    <div id="data-body"></div>
+    <div class="modal-close-row"><button onclick="closeDataModal()">Done</button></div>
+  </div>
+</div>
+<input type="file" id="backup-file" accept="application/json,.json" style="display:none" onchange="onBackupFile(this)" />
 
 <!-- Plate Calculator Modal -->
 <div class="modal-overlay" id="plate-modal" onclick="closePlateModal(event)">
@@ -2633,12 +2674,6 @@ function renderRecovery() {
     </div>
   </div>
 
-  <div class="rec-section">
-    <div class="rec-h">Progression Rules — Cycle 1</div>
-    <div class="rec-rule"><span class="rec-bullet">W1–3</span><span class="rec-rule-text">Hold weights steady</span></div>
-    <div class="rec-rule"><span class="rec-bullet">W4–6</span><span class="rec-rule-text">+5 lb to squat, bench, deadlift if reps were clean</span></div>
-    <div class="rec-rule"><span class="rec-bullet">W7–9</span><span class="rec-rule-text">Hold weights steady, focus on quality</span></div>
-  </div>
   `;
   document.getElementById('recovery-content').innerHTML = html;
 }
@@ -3486,12 +3521,218 @@ function gapAdjustWeights() {
   openWeightModal(wi, preset);
 }
 
+// ═══════════════════════════════════════════════
+//  BACKUP  —  export, import, and rolling snapshots
+//  Everything lives in three localStorage keys. This gets them out of the
+//  browser and back in again, and keeps local snapshots as a safety net.
+// ═══════════════════════════════════════════════
+const SNAP_KEY = 'c1_snapshots';
+const BACKUP_FORMAT = 'cycle1-workout-backup';
+const BACKUP_SCHEMA = 1;
+// Resolved lazily: CD_STATE_KEY is declared later in the file.
+function backupKeys() { return [STATE_KEY, HIST_KEY, CD_STATE_KEY]; }
+
+function collectBackup() {
+  const data = {};
+  for (const k of backupKeys()) {
+    const v = localStorage.getItem(k);
+    if (v !== null) data[k] = v;
+  }
+  return {format:BACKUP_FORMAT, schema:BACKUP_SCHEMA, app:'cycle1-workout',
+          exportedAt:new Date().toISOString(), data};
+}
+function applyBackupData(data) {
+  for (const k of backupKeys()) {
+    if (data[k] !== undefined) localStorage.setItem(k, data[k]);
+    else localStorage.removeItem(k);
+  }
+  location.reload();
+}
+
+// ── Rolling snapshots ──
+function loadSnaps() { try { return JSON.parse(localStorage.getItem(SNAP_KEY)) || []; } catch(e) { return []; } }
+function saveSnaps(a) {
+  // Drop the oldest and retry if we run into the storage quota.
+  for (let i = 0; i < 6; i++) {
+    try { localStorage.setItem(SNAP_KEY, JSON.stringify(a)); return true; }
+    catch (e) { if (a.length <= 1) return false; a.shift(); }
+  }
+  return false;
+}
+function takeSnapshot(force) {
+  try {
+    const snaps = loadSnaps();
+    const cur = collectBackup();
+    const curStr = JSON.stringify(cur.data);
+    const last = snaps[snaps.length - 1];
+    if (!force && last) {
+      if (last.d === curStr) return;                                   // nothing changed
+      if (Date.now() - Date.parse(last.at) < 20 * 36e5) return;        // at most one a day
+    }
+    snaps.push({at:cur.exportedAt, d:curStr});
+    while (snaps.length > 5) snaps.shift();
+    saveSnaps(snaps);
+  } catch (e) {}
+}
+function restoreSnapshot(idx) {
+  const snaps = loadSnaps(), snap = snaps[idx];
+  if (!snap) return;
+  if (!confirm('Restore the snapshot from ' + new Date(snap.at).toLocaleString() +
+               '?\n\nYour current data is replaced. A snapshot of it is taken first, so this is undoable.')) return;
+  takeSnapshot(true);
+  try { applyBackupData(JSON.parse(snap.d)); }
+  catch (e) { alert('That snapshot could not be read.'); }
+}
+
+// ── Export ──
+function backupFileName() {
+  const d = new Date(), pad = n => String(n).padStart(2,'0');
+  return `cycle1-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+}
+function markExported(iso) {
+  state.lastExportAt = iso;
+  state.backupNudgeWeek = state.currentWeek || 0;
+  saveState(state);
+  renderBackupNudge();
+}
+async function exportBackup() {
+  const b = collectBackup();
+  const txt = JSON.stringify(b, null, 2);
+  const name = backupFileName();
+  // Preferred path on iOS: hand the file to the share sheet so it can be saved
+  // straight into Files or iCloud Drive.
+  try {
+    const file = new File([txt], name, {type:'application/json'});
+    if (navigator.canShare && navigator.canShare({files:[file]})) {
+      await navigator.share({files:[file], title:'Cycle 1 backup'});
+      markExported(b.exportedAt);
+      openDataModal();
+      return;
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;   // user cancelled — not a backup
+  }
+  const blob = new Blob([txt], {type:'application/json'});
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+  markExported(b.exportedAt);
+  openDataModal();
+}
+
+// ── Import ──
+let _pendingImport = null;
+function pickBackupFile() { document.getElementById('backup-file').click(); }
+function onBackupFile(input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let parsed;
+    try { parsed = JSON.parse(r.result); }
+    catch (e) { alert("That file couldn't be read as JSON, so it isn't a backup."); return; }
+    previewImport(parsed);
+  };
+  r.onerror = () => alert("That file couldn't be read.");
+  r.readAsText(f);
+}
+function previewImport(b) {
+  if (!b || b.format !== BACKUP_FORMAT) { alert("That isn't a Cycle 1 backup file."); return; }
+  if ((b.schema || 0) > BACKUP_SCHEMA) {
+    alert('That backup was written by a newer version of the app, so it can\'t be read here.'); return;
+  }
+  const d = b.data || {};
+  let hist = [], cardio = {}, st = {};
+  try { hist   = JSON.parse(d[HIST_KEY]      || '[]'); } catch (e) {}
+  try { cardio = JSON.parse(d[CD_STATE_KEY]  || '{}'); } catch (e) {}
+  try { st     = JSON.parse(d[STATE_KEY]     || '{}'); } catch (e) {}
+  _pendingImport = b;
+  const checked = st.checked ? Object.values(st.checked).filter(Boolean).length : 0;
+  const cardioN = (cardio.history || []).length;
+  document.getElementById('data-body').innerHTML = `
+    <div class="bk-warn">
+      <div class="bk-warn-t">Replace everything with this backup?</div>
+      <div class="bk-warn-b">A snapshot of your current data is taken first, so this is undoable.</div>
+    </div>
+    <div class="bk-rows">
+      <div class="bk-row"><span>Written</span><b>${new Date(b.exportedAt).toLocaleString()}</b></div>
+      <div class="bk-row"><span>Logged sessions</span><b>${hist.length}</b></div>
+      <div class="bk-row"><span>Completed items</span><b>${checked}</b></div>
+      <div class="bk-row"><span>Cardio sessions</span><b>${cardioN}</b></div>
+      <div class="bk-row"><span>Cardio rung</span><b>${cardio.activeRung || '—'}</b></div>
+    </div>
+    <button class="bk-btn bk-btn-danger" onclick="confirmImport()">Replace my data</button>
+    <button class="bk-btn" onclick="openDataModal()">Cancel</button>`;
+  document.getElementById('data-modal').classList.add('open');
+}
+function confirmImport() {
+  if (!_pendingImport) return;
+  takeSnapshot(true);
+  const d = _pendingImport.data || {};
+  _pendingImport = null;
+  applyBackupData(d);
+}
+
+// ── Sheet ──
+function openDataModal() {
+  const last = state.lastExportAt
+    ? new Date(state.lastExportAt).toLocaleString()
+    : 'Never — nothing has left this device yet';
+  const snaps = loadSnaps();
+  const snapHtml = snaps.length
+    ? snaps.slice().reverse().map((sn, i) => {
+        const realIdx = snaps.length - 1 - i;
+        return `<button class="bk-snap" onclick="restoreSnapshot(${realIdx})">
+          <span>${new Date(sn.at).toLocaleString()}</span><span class="bk-snap-a">Restore</span></button>`;
+      }).join('')
+    : `<div class="bk-empty">No snapshots yet. One is taken automatically each day you use the app.</div>`;
+  document.getElementById('data-body').innerHTML = `
+    <div class="bk-rows">
+      <div class="bk-row"><span>Last backup</span><b>${last}</b></div>
+    </div>
+    <button class="bk-btn bk-btn-primary" onclick="exportBackup()">Export backup</button>
+    <button class="bk-btn" onclick="pickBackupFile()">Restore from a file</button>
+    <div class="bk-sec">On-device snapshots</div>
+    ${snapHtml}
+    <div class="bk-note">Snapshots live in this browser, so they survive a mistake but not a lost phone. Export to Files or iCloud Drive for that.</div>`;
+  document.getElementById('data-modal').classList.add('open');
+}
+function closeDataModal(e) {
+  if (e && e.target !== document.getElementById('data-modal')) return;
+  document.getElementById('data-modal').classList.remove('open');
+  _pendingImport = null;
+}
+
+// ── Weekly nudge ──
+function renderBackupNudge() {
+  const slot = document.getElementById('backup-nudge-slot');
+  if (!slot) return;
+  const wi = state.currentWeek || 0;
+  if (!weekDone(wi) || state.backupNudgeWeek === wi) { slot.innerHTML = ''; return; }
+  slot.innerHTML = `
+    <div class="bk-nudge">
+      <div class="bk-nudge-t">${WEEKS[wi].label} complete</div>
+      <div class="bk-nudge-b">Good moment to save a backup. Two taps to Files or iCloud Drive.</div>
+      <div class="bk-nudge-a">
+        <button class="gap-btn gap-btn-primary" onclick="exportBackup()">Back up now</button>
+        <button class="gap-btn" onclick="dismissBackupNudge()">Later</button>
+      </div>
+    </div>`;
+}
+function dismissBackupNudge() {
+  state.backupNudgeWeek = state.currentWeek || 0;
+  saveState(state);
+  renderBackupNudge();
+}
+
 function renderAll() {
   renderHeader();
   renderGoals();
   renderSessions();
   renderTodayBanner();
   renderGapCard();
+  renderBackupNudge();
 }
 
 // ── Init ──
@@ -4272,6 +4513,8 @@ function cdRenderHistory() {
     <div class="cd-card">${logItems}</div>
     <div style="height:8px"></div>`;
 }
+
+takeSnapshot();  // after the whole script has evaluated
 
 document.addEventListener('visibilitychange',()=>{
   if (document.hidden) return;
